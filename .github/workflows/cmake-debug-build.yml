@@ -1,0 +1,195 @@
+name: CMakeDebugBuild
+on:
+  push:
+    branches:
+      - 'autobuild'
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: false
+        default: 'info'
+        type: choice
+        options:
+          - info
+          - warning
+          - debug
+
+# Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+env:
+  BUILD_TYPE: Debug
+
+jobs:
+  install-dependencies:
+    name: Install Dependencies
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+
+    steps:
+      - name: Install Linux Dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libconfig++-dev
+
+      - name: Install macOS Dependencies
+        if: runner.os == 'macOS'
+        run: |
+          brew install libconfig
+
+  build-debug:
+    name: Build Debug
+    needs: install-dependencies
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+
+    steps:
+      - name: Checkout The Repository
+        uses: actions/checkout@v3.5.3
+
+        # Configure CMake in a 'build/debug' subdirectory.
+        # `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+        # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+
+        # Build for Linux
+      - name: Build for Linux
+        id: build-for-linux
+        if: runner.os == 'Linux'
+        run: |
+          cmake -E make_directory ${{github.workspace}}/build/debug
+          cmake -B ${{github.workspace}}/build/debug -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+          cmake --build ${{github.workspace}}/build/debug --config ${{env.BUILD_TYPE}}
+
+        # Cache Linux build
+      - name: Cache Linux Build
+        id: cache-linux-build
+        uses: actions/cache@v3
+        if: steps.build-for-linux.outcome == 'success'
+        env:
+          cache-name: cache-linux-build
+        with:
+          path: ${{github.workspace}}/build/debug
+          key: ${{ runner.os }}-build-${{ env.cache-name }}
+
+        # Build for Windows
+      - name: Build for Windows
+        id: build-for-windows
+        if: runner.os == 'Windows'
+        run: |
+          dir
+          cmake -E make_directory ${{github.workspace}}/build/debug
+          cmake -B ${{github.workspace}}/build/debug -DCMAKE_BUILD_TYPE=Debug
+          cmake --build ${{github.workspace}}/build/debug --config Debug
+
+        # Cache Window build
+      - name: Cache Windows Build
+        id: cache-windows-build
+        uses: actions/cache@v3
+        if: steps.build-for-windows.outcome == 'success'
+        env:
+          cache-name: cache-windows-build
+        with:
+          path: ${{github.workspace}}/build/debug
+          key: ${{ runner.os }}-build-${{ env.cache-name }}
+
+        # Build for macOS
+      - name: Build for macOS
+        id: build-for-macos
+        if: runner.os == 'macOS'
+        run: |
+          cmake -E make_directory ${{github.workspace}}/build/debug
+          cmake -B ${{github.workspace}}/build/debug -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+          cmake --build ${{github.workspace}}/build/debug --config ${{env.BUILD_TYPE}}
+
+        # Cache macOS build
+      - name: Cache macOS Build
+        id: cache-macos-build
+        uses: actions/cache@v3
+        if: steps.build-for-macos.outcome == 'success'
+        env:
+          cache-name: cache-macos-build
+        with:
+          path: ${{github.workspace}}/build/debug
+          key: ${{ runner.os }}-build-${{ env.cache-name }}
+
+  upload-artifacts:
+    name: Upload Artifacts
+    needs: build-debug
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+
+    steps:
+      # Linux artifact actions
+      - name: Get Linux Debug Build
+        id: get-linux-debug-build
+        uses: actions/cache@v3
+        with:
+          path: ${{github.workspace}}/build/debug
+          key: ${{ runner.os }}-build-${{ env.cache-name }}
+
+      - name: Create Linux Debug Archive
+        id: create-linux-debug-archive
+        if: |
+          steps.get-linux-debug-build.conclusion == 'success' && runner.os == 'Linux'
+        run: 7z a ${{github.workspace}}/freewake-linux.zip ${{github.workspace}}/build/debug
+
+      - name: Upload Linux Debug Artifact
+        # Upload Linux Debug as an artifact
+        uses: actions/upload-artifact@v3
+        if: |
+          steps.create-linux-debug-archive.conclusion == 'success' && runner.os == 'Linux'
+        with:
+          name: FreeWake-Linux-Debug
+          path: ${{github.workspace}}/freewake-linux.zip
+
+        # Windows artifact actions
+      - name: Get Windows Debug Build
+        id: get-windows-debug-build
+        uses: actions/cache@v3
+        with:
+          path: ${{github.workspace}}/build/debug
+          key: ${{ runner.os }}-build-${{ env.cache-name }}
+
+      - name: Create Windows Debug Archive
+        id: create-windows-debug-archive
+        if: |
+          steps.get-windows-debug-build.conclusion == 'success' && runner.os == 'Windows'
+        run: 7z a ${{github.workspace}}/freewake-windows.zip ${{github.workspace}}/build/debug
+
+      - name: Upload Windows Debug Artifact
+        # Upload Windows Debug as an artifact
+        uses: actions/upload-artifact@v3
+        if: |
+          steps.create-windows-debug-archive.conclusion == 'success' && runner.os == 'Windows'
+        with:
+          name: FreeWake-Windows-Debug
+          path: ${{github.workspace}}/freewake-windows.zip
+
+        # macOS artifact actions
+      - name: Get macOS Debug Build
+        id: get-macos-debug-build
+        uses: actions/cache@v3
+        with:
+          path: ${{github.workspace}}/build/debug
+          key: ${{ runner.os }}-build-${{ env.cache-name }}
+
+      - name: Create macOS Debug Archive
+        id: create-macos-debug-archive
+        if: |
+          steps.get-macos-debug-build.conclusion == 'success' && runner.os == 'macOS'
+        run: 7z a ${{github.workspace}}/freewake-macos.zip ${{github.workspace}}/build/debug
+
+      - name: Upload macOS Debug Artifact
+        # Upload macOS Debug as an artifact
+        uses: actions/upload-artifact@v3
+        if: |
+          steps.create-macos-debug-archive.conclusion == 'success' && runner.os == 'macOS'
+        with:
+          name: FreeWake-macOS-Debug
+          path: ${{github.workspace}}/freewake-macos.zip

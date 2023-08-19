@@ -1,10 +1,9 @@
-#define _CRT_SECURE_NO_WARNINGS
-#include "general.h"
-#include "FreeWakeWing.h"
-int main()
+#include "../include/general.h"
+#include "../include/PerfCode.h"
+main()
 {
 //computes velocity due to time step file generated from Free Wake 2007 at
-//multiple points 
+//point P
 //Step 1 read in information about point and time step from matlab file
 //Step 2 read in time step file for the specified time step
 //Step 3 compute velocities at point P
@@ -18,29 +17,17 @@ int main()
 //
 // The output path is OUTPUT_PATH, which is defined in general.h!!
 //
-	struct Points
-	{double x;
-	double y;
-	double z;
-	}Points[10000];
-
-	struct Vels
-	{double u;
-	double v;
-	double w;
-	}Vels[10000];
 
 	double P[3],w_ind[3],tempA[3];
 	int i,j,k;				// loop counter
 	int plane,type;
 	int imax,jmax,kmax;
 	int wing,span,time;		//more loop counters
-	int numpoints=0;			//number of points
 	double xmin,xmax,ymin,ymax,zmin,zmax;
 	double xstep,ystep,zstep;
 	double tempS;
 	char ch;		//generic character
-	
+
 
 //	GENERAL info;			//general info
 	DVE *surfaceDVE, **wakeDVE;
@@ -55,6 +42,7 @@ int main()
 //===================================================================//
 
 	//creates file name for file with point information
+//	sprintf(iofile,"%s%s",OUTPUT_PATH,"pointinfo.txt");
 	sprintf(iofile,"%s%s",OUTPUT_PATH,"pointinfo.txt");
 
 	// checks if input file exists
@@ -63,25 +51,23 @@ int main()
 		printf("File could not be opened, stupid:\n");
 		exit(1);
 	}
-	//opens input file
-	fp = fopen("./output/pointinfo.txt", "r");
-	//scan number of points
-	fscanf(fp,"%d ", &numpoints);
-	
-	for (i=0;i<numpoints;i++){
-	fscanf(fp,"%d %lf %lf %lf", &timestep,&Points[i].x,&Points[i].y,&Points[i].z);
-	}
 
+	fscanf(fp,"%d %lf %lf %lf", &timestep,&P[0],&P[1],&P[2]);
+
+	//opens input file
+	fp = fopen(iofile, "r");
 
 	fclose(fp);
 
 
-//printf("%d   %lf   %lf  %lf\n", timestep,P[0],P[1],P[2]);
+printf("%d   %lf   %lf  %lf\n", timestep,P[0],P[1],P[2]);
 
 //===================================================================//
 //END Step 1 
 //===================================================================//
 
+printf("\n DONE\n");
+scanf("%d",&timestep);
 
 //===================================================================//
 //	START Step 2	
@@ -255,25 +241,17 @@ int main()
 //===================================================================//
 
 
-
 //===================================================================//
 //START Step 3		
 //computing velocity in P
 //===================================================================//
-	i=0;
-	for(i=0;i<numpoints;i++)
-	{
-		P[0] = Points[i].x;
-		P[1] = Points[i].y;
-		P[2] = Points[i].z;
+
 	//velocity is induced by all surface and wake DVE's in point P
 	DVE_Induced_Velocity(info,P,surfaceDVE,wakeDVE,timestep,w_ind);
 				 			//subroutine in induced_velocity.cpp
 
-	Vels[i].u = w_ind[0];
-	Vels[i].v = w_ind[1];
-	Vels[i].w = w_ind[2];
-	}
+
+
 //computing induced velocity of most right point of each wing.
 //right wingtip points are stored in xright and the velocity in uright
 //for(wing=0;wing<info.nowing;wing++)
@@ -299,37 +277,26 @@ int main()
 //	START Step 4
 //	saving output (coordinates and induced velocity components)
 //===================================================================//
-//printf("\n Induced Velocities \n");
-//printf("%lf  %lf  %lf\n",w_ind[0],w_ind[1],w_ind[2]);
+printf("\n Induced Velocities \n");
+printf("%lf  %lf  %lf\n",w_ind[0],w_ind[1],w_ind[2]);
 
 
 // Create Output file
 sprintf(iofile,"%s%s",OUTPUT_PATH,"velocityinfo.txt");
 
 	// checks if input file exists
-	// if ((fp = fopen(iofile, "r"))== NULL)
-	//{
-	//	printf("File could not be opened, stupid:\n");
-	//	exit(1);
-	//}
+	if ((fp = fopen(iofile, "r"))== NULL)
+	{
+		printf("File could not be opened, stupid:\n");
+		exit(1);
+	}
 // Open output file and write w_ind	
  fs = fopen(iofile,"w");
-
- fprintf(fs,"%d\n",numpoints);
-
- i=0;
- for(i=0;i<numpoints;i++)
-	{
-
- fprintf(fs,"%1f  %1f  %1f\n", Vels[i].u,Vels[i].v,Vels[i].w);
- }
-
+ fprintf(fs,"%1f  %1f  %1f", w_ind[0],w_ind[1],w_ind[2]);
  fclose(fs);
 // End Create Output file
 
-
-// printf("\n DONE\n");
-printf("\nIt's done.  Enter anything, anything: ");
+printf("\n DONE\n");
 //scanf("%d",&timestep);
 
 return(0);

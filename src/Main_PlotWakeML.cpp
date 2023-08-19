@@ -1,5 +1,5 @@
-#include "general.h"
-#include "PerfCode.h"
+#include "../include/general.h"
+#include "../include/PerfCode.h"
 main()
 {
 //This program plots the wake of a wake step.
