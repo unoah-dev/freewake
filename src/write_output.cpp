@@ -518,22 +518,22 @@ void Save_Timestep(const GENERAL info,const int timestep,DVE **wakePtr,\
 		fprintf(fp,"%6d",span);
 		//coord. of ref point
 		fprintf(fp," %16.12lf %16.12lf %16.12lf",\
-				surfacePtr[span].xo[0],surfacePtr[span].xo[1],\
-				surfacePtr[span].xo[2]);
+				sanitize_zero(surfacePtr[span].xo[0]),sanitize_zero(surfacePtr[span].xo[1]),\
+				sanitize_zero(surfacePtr[span].xo[2]));
 		//normal forces per density
 		fprintf(fp," %16.12lf %16.12lf %16.12lf %16.12lf",\
-				N_force[span][0]+N_force[span][1],N_force[span][1],\
-				N_force[span][2]+N_force[span][3],N_force[span][3]);
+				sanitize_zero(N_force[span][0]+N_force[span][1]),sanitize_zero(N_force[span][1]),\
+				sanitize_zero(N_force[span][2]+N_force[span][3]),sanitize_zero(N_force[span][3]));
 		//more info on element
 		fprintf(fp," %16.12lf %16.12lf %16.12lf %16.12lf %16.12lf",\
-				surfacePtr[span].A,surfacePtr[span].B,surfacePtr[span].C,\
-				surfacePtr[span].eta,surfacePtr[span].xsi);
+				sanitize_zero(surfacePtr[span].A),sanitize_zero(surfacePtr[span].B),sanitize_zero(surfacePtr[span].C),\
+				sanitize_zero(surfacePtr[span].eta),sanitize_zero(surfacePtr[span].xsi));
 		fprintf(fp," %16.12lf %16.12lf %16.12lf",\
-				surfacePtr[span].nu*RtD,surfacePtr[span].epsilon*RtD,\
-				surfacePtr[span].psi*RtD);
-		fprintf(fp," %16.12lf %16.12lf %16.12lf",surfacePtr[span].phiLE*RtD,\
-				(surfacePtr[span].phiLE+surfacePtr[span].phiTE)*0.5*RtD,\
-				surfacePtr[span].phiTE*RtD);
+				sanitize_zero(surfacePtr[span].nu*RtD),sanitize_zero(surfacePtr[span].epsilon*RtD),\
+				sanitize_zero(surfacePtr[span].psi*RtD));
+		fprintf(fp," %16.12lf %16.12lf %16.12lf",sanitize_zero(surfacePtr[span].phiLE*RtD),\
+				sanitize_zero((surfacePtr[span].phiLE+surfacePtr[span].phiTE)*0.5*RtD),\
+				sanitize_zero(surfacePtr[span].phiTE*RtD));
 		fprintf(fp,"\n");
 	}
 
@@ -555,30 +555,30 @@ void Save_Timestep(const GENERAL info,const int timestep,DVE **wakePtr,\
 			fprintf(fp,"%5d%5d",span,time);
 			//coord. of ref point
 			fprintf(fp," %16.12lf %16.12lf %16.12lf",\
-						wakePtr[time][span].xo[0],wakePtr[time][span].xo[1],\
-						wakePtr[time][span].xo[2]);
+						sanitize_zero(wakePtr[time][span].xo[0]),sanitize_zero(wakePtr[time][span].xo[1]),\
+						sanitize_zero(wakePtr[time][span].xo[2]));
 			//nu,epsilon, sweep, dihedral of elemenatry wing
 			fprintf(fp," %16.12lf %16.12lf %16.12lf",\
-						wakePtr[time][span].nu*RtD,\
-						wakePtr[time][span].epsilon*RtD,\
-						wakePtr[time][span].psi*RtD);
+						sanitize_zero(wakePtr[time][span].nu*RtD),\
+						sanitize_zero(wakePtr[time][span].epsilon*RtD),\
+						sanitize_zero(wakePtr[time][span].psi*RtD));
 			//local free stream velocity at center
 			fprintf(fp," %16.12lf %16.12lf %16.12lf",\
-						wakePtr[time][span].u[0],wakePtr[time][span].u[1],\
-						wakePtr[time][span].u[2]);
+						sanitize_zero(wakePtr[time][span].u[0]),sanitize_zero(wakePtr[time][span].u[1]),\
+						sanitize_zero(wakePtr[time][span].u[2]));
 			fprintf(fp," %16.12lf %16.12lf %16.12lf",\
-						wakePtr[time][span].A,wakePtr[time][span].B,\
-						wakePtr[time][span].C);
+						sanitize_zero(wakePtr[time][span].A),sanitize_zero(wakePtr[time][span].B),\
+						sanitize_zero(wakePtr[time][span].C));
 			//element half span and half chord
 			fprintf(fp," %16.12lf %16.12lf",\
-						wakePtr[time][span].eta,wakePtr[time][span].xsi);
+						sanitize_zero(wakePtr[time][span].eta),sanitize_zero(wakePtr[time][span].xsi));
 			//element half span and half chord
 			fprintf(fp," %16.12lf",\
-						wakePtr[time][span].K);
+						sanitize_zero(wakePtr[time][span].K));
 			//leading-edge, mid-chord, and trailing edge sweep2
 			fprintf(fp," %16.12lf %16.12lf %16.12lf",\
-				wakePtr[time][span].phiLE*RtD,\
-				wakePtr[time][span].phi0*RtD,wakePtr[time][span].phiTE*RtD);
+				sanitize_zero(wakePtr[time][span].phiLE*RtD),\
+				sanitize_zero(wakePtr[time][span].phi0*RtD),sanitize_zero(wakePtr[time][span].phiTE*RtD));
 
 //			fprintf(fp," %16.12lf",wakePtr[time][span].singfct);
 

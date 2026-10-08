@@ -47,9 +47,9 @@ void DVE_Resultant(const GENERAL,const PANEL *,const DVE *,DVE **,\
 	for(n=0;n<info.noelement;n++)
 	{
 		m=n*3;
-		surfacePtr[n].A=x[m];
-		surfacePtr[n].B=x[m+1];
-		surfacePtr[n].C=x[m+2];
+		surfacePtr[n].A=sanitize_zero(x[m]);
+		surfacePtr[n].B=sanitize_zero(x[m+1]);
+		surfacePtr[n].C=sanitize_zero(x[m+2]);
 //#printf("A= %lf\tB= %lf\tC= %lf\n",x[m],x[m+1],x[m+2]);//##
 	}
 }
@@ -118,9 +118,9 @@ int n,m;			//counter
 	for(n=0;n<info.noelement;n++)
 	{
 		m=n*3;
-		surfacePtr[n].A=R[m];
-		surfacePtr[n].B=R[m+1];
-		surfacePtr[n].C=R[m+2];
+		surfacePtr[n].A=sanitize_zero(R[m]);
+		surfacePtr[n].B=sanitize_zero(R[m+1]);
+		surfacePtr[n].C=sanitize_zero(R[m+2]);
 //#printf("A= %lf\tB= %lf\tC= %lf\n",R[m],R[m+1],R[m+2]);//#
 	}
 
@@ -451,9 +451,9 @@ int Dsize=info.Dsize;		//size of matrix D
 	for(n=0;n<info.noelement;n++)
 	{
 		m=n*3;
-		elementPtr[n].A=x[m];
-		elementPtr[n].B=x[m+1];
-		elementPtr[n].C=x[m+2];
+		elementPtr[n].A=sanitize_zero(x[m]);
+		elementPtr[n].B=sanitize_zero(x[m+1]);
+		elementPtr[n].C=sanitize_zero(x[m+2]);
 //#printf("A= %lf\tB= %lf\tC= %lf\n",x[m],x[m+1],x[m+2]);//##
 	}
 }

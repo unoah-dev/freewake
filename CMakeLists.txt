@@ -15,6 +15,27 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 # Third-party dependencies
 include(FetchContent)
+
+# Eigen3 linear algebra dependency
+find_package(Eigen3 3.3 QUIET CONFIG)
+if (NOT Eigen3_FOUND)
+    find_package(Eigen3 3.3 QUIET)
+endif()
+
+if (NOT TARGET Eigen3::Eigen)
+    set(EIGEN_BUILD_DOC OFF CACHE INTERNAL "")
+    set(BUILD_TESTING OFF CACHE INTERNAL "")
+    set(EIGEN_BUILD_PKGCONFIG OFF CACHE INTERNAL "")
+    FetchContent_Declare(
+        Eigen3
+        GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+        GIT_TAG 3.4.0
+        GIT_SHALLOW TRUE
+    )
+    FetchContent_MakeAvailable(Eigen3)
+endif()
+
+# yaml-cpp dependency
 set(YAML_CPP_BUILD_TESTS OFF CACHE INTERNAL "Disable yaml-cpp tests")
 set(YAML_CPP_BUILD_TOOLS OFF CACHE INTERNAL "Disable yaml-cpp tools")
 set(YAML_BUILD_SHARED_LIBS OFF CACHE INTERNAL "Build yaml-cpp as static library")
@@ -51,7 +72,7 @@ else()
 endif()
 
 # Link libraries
-target_link_libraries(FreeWake PRIVATE yaml-cpp)
+target_link_libraries(FreeWake PRIVATE yaml-cpp Eigen3::Eigen)
 
 # Link math library on UNIX systems if required
 if (UNIX AND NOT APPLE)

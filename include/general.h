@@ -19,6 +19,14 @@
 #define PROGRAM_VERSION "FreeWake2018_Omega"
 #define AIRFOIL_PATH "airfoils/"
 
+inline double sanitize_zero(double val, double eps = 1e-15)
+{
+    if (std::abs(val) < eps || val == 0.0) {
+        return 0.0;
+    }
+    return val;
+}
+
 
 //global Variables
 FILE *test;				//file for test output during debugging

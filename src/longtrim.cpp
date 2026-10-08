@@ -195,21 +195,21 @@ void LongitudinalTrim(GENERAL info,PANEL *panelPtr,DVE *surfaceDVEPtr,int HTpane
 		fprintf(spaninfo,"%6d",i);
 		//coord. of ref point
 		fprintf(spaninfo," %16.12lf %16.12lf %16.12lf",\
-				surfacePtr[m].xo[0],surfacePtr[m].xo[1],\
-				surfacePtr[m].xo[2]);
+				sanitize_zero(surfacePtr[m].xo[0]),sanitize_zero(surfacePtr[m].xo[1]),\
+				sanitize_zero(surfacePtr[m].xo[2]));
 		//normal, lift, side, drag force coefficients
 		fprintf(spaninfo," %16.12lf %16.12lf %16.12lf %16.12lf",\
-				cn[i],cl[i],cy[i],cd[i]);
+				sanitize_zero(cn[i]),sanitize_zero(cl[i]),sanitize_zero(cy[i]),sanitize_zero(cd[i]));
 
 		//more info on element
 		fprintf(spaninfo," %16.12lf %16.12lf %16.12lf %16.12lf %16.12lf %16.12lf",\
-				surfacePtr[m].A,surfacePtr[m].B,surfacePtr[m].C,S[i],\
-				surfacePtr[m].eta*2,surfacePtr[m].xsi*2*info.m);
+				sanitize_zero(surfacePtr[m].A),sanitize_zero(surfacePtr[m].B),sanitize_zero(surfacePtr[m].C),sanitize_zero(S[i]),\
+				sanitize_zero(surfacePtr[m].eta*2),sanitize_zero(surfacePtr[m].xsi*2*info.m));
 		fprintf(spaninfo," %16.12lf %16.12lf %16.12lf",\
-				surfacePtr[m].nu*RtD,surfacePtr[m].epsilon*RtD,\
-				surfacePtr[m].psi*RtD);
+				sanitize_zero(surfacePtr[m].nu*RtD),sanitize_zero(surfacePtr[m].epsilon*RtD),\
+				sanitize_zero(surfacePtr[m].psi*RtD));
 		fprintf(spaninfo," %16.12lf",\
-				(surfacePtr[m].phiLE*RtD));
+				sanitize_zero(surfacePtr[m].phiLE*RtD));
 		fprintf(spaninfo,"\n");
 
 		i++;  //next span index 
