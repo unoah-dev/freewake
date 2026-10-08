@@ -1,36 +1,41 @@
-cmake_minimum_required(VERSION 3.10)
-project(freewake)
+cmake_minimum_required(VERSION 3.16)
+project(FreeWake LANGUAGES CXX C)
 
-set(CMAKE_CXX_STANDARD 14)
+# Global C++ standard requirements
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Linux Build
-if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    include_directories(
-            include/
-            /usr/lib/x86_64-linux-gnu/
-            /usr/lib/gcc/x86_64-linux-gnu/7/
-    )
-    link_directories(
-            /usr/lib/x86_64-linux-gnu/
-            /usr/lib/gcc/x86_64-linux-gnu/7/
-    )
-endif ()
+# Emit compiled binaries into a dedicated bin/ directory
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
-# Windows Build
-if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    SET(CMAKE_MAKE_PROGRAM "mingw32-make.exe")
-    include_directories(%USERPROFILE%/vcpkg/installed/x86-windows/include)
-    link_directories(%USERPROFILE%/vcpkg/installed/x86-windows/lib)
-endif ()
-
-# MacOS Build
-if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    include_directories(/usr/local/lib/)
-    link_directories(/usr/local/lib)
-endif ()
-
-add_executable(freewake
-        include/general.h
-        include/PerfCode.h
-        src/Main_PerfCode2018.cpp
+# FreeWake executable target
+add_executable(FreeWake
+    src/Main_PerfCode2018.cpp
+    include/FreeWakeWing.h
+    include/PerfCode.h
+    include/alloc.h
+    include/general.h
+    include/ref_frame_transform.h
+    include/typedef.h
+    include/vector_algebra.h
 )
+
+# Target-scoped include directories
+target_include_directories(FreeWake PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+# Target-scoped compiler warning flags
+if (MSVC)
+    target_compile_options(FreeWake PRIVATE /W4)
+else()
+    target_compile_options(FreeWake PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+# Link math library on UNIX systems if required
+if (UNIX AND NOT APPLE)
+    target_link_libraries(FreeWake PRIVATE m)
+endif()
+
+# Backward-compatible target alias
+add_executable(freewake ALIAS FreeWake)
+
