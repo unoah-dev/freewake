@@ -42,8 +42,42 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# JetBrains IDE
-.idea/
-
 # Build Artifacts
 build/
+bin/
+lib/
+out/
+
+# IDE and Editor Artifacts
+.idea/
+.vs/
+.vscode/
+
+# Compiled Binaries, Libraries and Objects
+*.exe
+*.out
+*.o
+*.obj
+*.so
+*.dylib
+*.dll
+*.a
+*.lib
+*.app
+
+# Debug Symbols and Profiling
+*.dSYM/
+*.dsym/
+*.pdb
+*.idb
+*.ilk
+*.gcov
+*.gcda
+*.gcno
+
+# CMake In-source Build Products
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+CTestTestfile.cmake
