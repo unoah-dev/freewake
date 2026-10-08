@@ -141,14 +141,14 @@ double R1[3],Ro[3],R2[3]; 	//resultant ind. force at bound vortex sides and cent
 double R[3];				//resultant ind. force/density of element l
 double N_free;				//magnitude free stream norm. forces/density
 double tempA[3],tempAA[3], tempS;
-double **U1,**Uo,**U2;		//mid-chord velocities of upstream DVE
+Array2D<double> U1, Uo, U2;		//mid-chord velocities of upstream DVE
 
 if(info.m>1) //if more than one lifting line
 {	//allocating temporary memory for the induced velocity of upstream DVE
 	//needed for averaging velocity induced at lifting lines
-	ALLOC2D(&U1,info.nospanelement,3);
-	ALLOC2D(&Uo,info.nospanelement,3);
-	ALLOC2D(&U2,info.nospanelement,3);
+	U1.allocate(info.nospanelement,3);
+	Uo.allocate(info.nospanelement,3);
+	U2.allocate(info.nospanelement,3);
 }
 
 //loop over number of panels
@@ -423,13 +423,6 @@ for (i=0;i<info.nopanel;i++)
 	 }	//End loop over k
   }	//End loop over j
 } //End loop over i
-
-if(info.m>1)
-{	//temporary variable of induced velocity of upstream DVE
-	FREE2D(&U1,info.nospanelement,3);
-	FREE2D(&Uo,info.nospanelement,3);
-	FREE2D(&U2,info.nospanelement,3);
-}
 
 }
 //===================================================================//

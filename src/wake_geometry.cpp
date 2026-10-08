@@ -293,7 +293,7 @@ void New_wakeDVE0(const GENERAL,DVE *,const DVE *);
 int time,span,wing,j,k;		//loop counters
 int element;				//index of surface elements along trailing edge
 double tempS,tempA[3];
-double ***xright,***uright;	//location and local velocity on right edge of a wing
+
 
 //##########################################
 //FILE *fp;														//#
@@ -303,8 +303,10 @@ double ***xright,***uright;	//location and local velocity on right edge of a win
 
 
 //allocating memory
-ALLOC3D(&xright,info.nowing,rightnow+1,3);
-ALLOC3D(&uright,info.nowing,rightnow+1,3);
+Array3D<double> xright_arr(info.nowing, rightnow + 1, 3);
+Array3D<double> uright_arr(info.nowing, rightnow + 1, 3);
+double ***xright = xright_arr.data();
+double ***uright = uright_arr.data();
 
 //*****************************************************************************
 //	1. computes local induced velocity at side edges of DVEs
@@ -531,10 +533,6 @@ ALLOC3D(&uright,info.nowing,rightnow+1,3);
 			wakePtr[time][span].singfct = tempS;  //assigning decay factor
 	}//next wing
 
-//*///****************************************************************************
-//freeing allocated memory
-FREE3D(&xright,info.nowing,rightnow+1,3);
-FREE3D(&uright,info.nowing,rightnow+1,3);
 }
 //===================================================================//
 		//END FUNCTION Relax_Wake
@@ -967,17 +965,19 @@ void New_vorticity_coefficients(const GENERAL info,const PANEL *panePtr,\
 // updated circulation and vorticity coefficients of stretched wakeDVE
 
 
-	double **D,*R,*BC;				//2nx2n matrix, 2n right hand side, new coeff.
 	double twothirds = 2./3.;
 	int size=2*info.nospanelement;	//dimension of D matrix and RHS-vector
 	int h,i;						//indices of DVEs, h is left i
 	int panel,n;					//loop over panel, spanwise elements
 	int col,row;					//column and row of D matrix
 
-  	//allocate memory
-	ALLOC2D(&D,size,size);
-	ALLOC1D(&R,size);
-	ALLOC1D(&BC,size);
+  	//allocate memory with modern RAII containers
+	Array2D<double> D_arr(size, size);
+	std::vector<double> R_vec(size);
+	std::vector<double> BC_vec(size);
+	double **D = D_arr.data();
+	double *R = R_vec.data();
+	double *BC = BC_vec.data();
 
 	//initializing D, R and BC
 	for(row=0;row<size;row++)
@@ -1211,11 +1211,6 @@ char filename[133];	//file path and name
  	fclose(fp);
 
 //*/////////////////
-
-	//Free memory
-	FREE2D(&D,size,size);
-	FREE1D(&R,size);
-	FREE1D(&BC,size);
 
 }
 //===================================================================//

@@ -109,8 +109,9 @@ tmin = timestep;
 	while (ch!='#');
 
 
-	//allocates memory for surfacePtr
-	ALLOC1D(&surfacePtr,nosurface);
+	//allocates memory for surfacePtr using modern RAII containers
+	std::vector<DVE> surface_vec(nosurface);
+	surfacePtr = surface_vec.data();
 
 	for(n=0;n<nosurface;n++)
 	{
@@ -140,8 +141,9 @@ tmin = timestep;
 	do ch = fgetc(fp);
 	while (ch!='#');
 
-	//allocates memory for wakePtr
-	ALLOC2D(&wakePtr,timestep+1,nospan);
+	//allocates memory for wakePtr using modern RAII containers
+	Array2D<DVE> wake_arr(timestep+1, nospan);
+	wakePtr = wake_arr.data();
 
 	for(time=0;time<=timestep;time++)
 	{
@@ -316,12 +318,8 @@ sprintf(iofile,"%s","wakeplot.m");
 
 	fclose(fp);
 
-
-	//allocates memory for surfacePtr
-	FREE1D(&surfacePtr,nosurface);
-
-	//allocates memory for wakePtr
-	FREE2D(&wakePtr,timestep+1,nospan);
+	surfacePtr = nullptr;
+	wakePtr = nullptr;
 
 	printf("\nIt's done.  Enter anything, anything: ");
 	scanf("%d",&timestep);

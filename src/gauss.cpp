@@ -24,10 +24,8 @@ void LU_Solver(double **,const int,const int *,double *);
 void GaussSolve(double **A, double *R, const int n,double *x)
 {
    int i,j,k,maxrow;
-   double tmp, **a;
-
-	//allocates memory for a
-	ALLOC2D(&a,(n),(n+1));
+   double tmp;
+   Array2D<double> a(n, n + 1);
 
    //assigns a=A|R
    for (i=0;i<n;i++)
@@ -90,8 +88,6 @@ void GaussSolve(double **A, double *R, const int n,double *x)
          tmp += a[j][k] * x[k];
       x[j] = (a[j][n] - tmp) / a[j][j];
    }
-   //frees allocated memory
-   FREE2D(&a,(n),(n+1));
 }
 //===================================================================//
 		//END GaussSolve
@@ -131,7 +127,6 @@ void LU_Decomposition(double **a, int n, int *indx)
 
 	int i,imax,j,k;
 	double big,dum,sum,temp;
-	double *vv;
 
 
 /*/##########################################
@@ -151,7 +146,7 @@ void LU_Decomposition(double **a, int n, int *indx)
  fclose(fp);
 //#######################################*///
 
-	ALLOC1D(&vv,n);		//temp scaling array
+	std::vector<double> vv(n);		//temp scaling array
 
 	for (i=0;i<n;i++)
 	{
@@ -198,7 +193,6 @@ void LU_Decomposition(double **a, int n, int *indx)
 		}
 	}
 
-	FREE1D(&vv,n);			//free memory
 
 /*##########################################
  fp = fopen("D_matrix.txt", "a");

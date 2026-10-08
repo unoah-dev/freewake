@@ -147,9 +147,10 @@ printf("========================================================================
 
 	info.AR = info.b*info.b/info.S;  //reference aspect ratio
 
-	//allocates mememory for panel information in 'panelPtr'
+	//allocates memory for panel information in 'panelPtr'
 	//for 'nopanel'-number panels
-	ALLOC1D(&panelPtr,info.nopanel);
+	std::vector<PANEL> panel_vec(info.nopanel);
+	panelPtr = panel_vec.data();
 
 
 //printf("\n\n\t\t!!!Only ONE CHORDWISE ROW OF SURFACE DVES!!\n");
@@ -252,9 +253,11 @@ printf("========================================================================
 		//END generation of elementary wings
 //===================================================================//
 
-//allocating memory
-ALLOC1D(&surfacePtr,info.noelement);	//surface DVE
-ALLOC1D(&cn,info.nospanelement);	//normal force coeff. of wing section
+//allocating memory using modern RAII containers
+std::vector<DVE> surface_vec(info.noelement);	//surface DVE
+std::vector<double> cn_vec(info.nospanelement);	//normal force coeff. of wing section
+surfacePtr = surface_vec.data();
+cn = cn_vec.data();
 
 //===================================================================//
 		//START wing generation
@@ -634,10 +637,10 @@ printf(" Dvt %lf Dfus %lf Dint %lf D %lf\n",Dvt,Dfuselage,Dint,D);
 //			END OF LOOP OVER AOA
 //===================================================================//
 
-	//free allocated memory
-	FREE1D(&panelPtr,info.nopanel);
-	FREE1D(&surfacePtr,info.noelement);
-	FREE1D(&cn,info.noelement);
+	//reset global pointers (memory automatically managed by RAII containers)
+	panelPtr = nullptr;
+	surfacePtr = nullptr;
+	cn = nullptr;
 	
 	fclose(MomSol);//close output file of trim iteration results
 	fclose(Performance);//close output file of performance calc's

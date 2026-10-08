@@ -180,11 +180,13 @@ int main()
 	fclose(fp);
 
 //===================================================================//
-//			allocates memory
+//			allocates memory using modern RAII containers
 //===================================================================//
 
-	ALLOC1D(&surfaceDVE,info.noelement);
-	ALLOC2D(&wakeDVE,timestep+1,info.nospanelement);
+	std::vector<DVE> surfaceDVE_vec(info.noelement);
+	Array2D<DVE> wakeDVE_arr(timestep+1, info.nospanelement);
+	surfaceDVE = surfaceDVE_vec.data();
+	wakeDVE = wakeDVE_arr.data();
 
 //===================================================================//
 //		reads info surface info

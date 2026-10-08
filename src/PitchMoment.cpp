@@ -54,8 +54,12 @@ double PitchingMoment(const GENERAL info,PANEL *panelPtr,DVE *&surfacePtr,\
 	double XCG[3];		//CG location in this routine is moved with wing
 				XCG[0] = xCG[0];	XCG[1] = xCG[1];	XCG[2] = xCG[2];
 
-double *R,**D;			//resultant vector and matrix
-int *pivot;				//holds information for pivoting D
+	std::vector<double> R_vec(info.Dsize, 0.0);
+	Array2D<double> D_arr(info.Dsize, info.Dsize, 0.0);
+	std::vector<int> pivot_vec(info.Dsize, 0);
+	double *R = R_vec.data();
+	double **D = D_arr.data();
+	int *pivot = pivot_vec.data();
 
 //===================================================================//
 		//Update tail incidence
@@ -120,8 +124,9 @@ int *pivot;				//holds information for pivoting D
 	//				 in global ref. frame, varies for rotating wings
 	//	BC			-boundary conditions
 	//
-	//allocates mememory for elements information in 'elementPtr'
-	ALLOC1D(&elementPtr,info.noelement);
+	//allocates memory for elements information in 'elementPtr'
+	std::vector<BOUND_VORTEX> elementPtr_vec(info.noelement);
+	elementPtr = elementPtr_vec.data();
 
 	l=0;	//initialize elementary wing index
 			//index is incremented by one at end of loop
@@ -142,10 +147,6 @@ int *pivot;				//holds information for pivoting D
 //===================================================================//
 		//START vorticity distribution
 //===================================================================//
-	//allocates mememory for R and D
-	ALLOC1D(&R,info.Dsize);
-	ALLOC2D(&D,info.Dsize,info.Dsize);
-
 	//initializing D
 	for(i=0; i<info.Dsize; i++)
 	for(j=0; j<info.Dsize; j++)
@@ -199,15 +200,17 @@ int *pivot;				//holds information for pivoting D
 		//END generating surface Distributed-Vorticity elements
 //===================================================================//
 
-	//frees allocated mememory only used for KHH part
-	FREE1D(&elementPtr,info.noelement);
+	//frees allocated memory only used for KHH part
+	elementPtr_vec.clear();
+	elementPtr = nullptr;
 
-	//allocate memory for relaxed wake part
-	ALLOC1D(&pivot,info.Dsize);							//pivoting array
-	ALLOC2D(&wakePtr,info.maxtime+1,info.nospanelement);	//wake DVE
-
-	ALLOC1D(&CDi_DVE,info.maxtime+1);			//total induced drag (Eppler)
-	ALLOC2D(&CN,info.maxtime+1,4);				//total normal forces
+	//allocate memory for relaxed wake part using modern RAII containers
+	Array2D<DVE> wakePtr_arr(info.maxtime + 1, info.nospanelement);
+	std::vector<double> CDi_DVE_vec(info.maxtime + 1, 0.0);
+	Array2D<double> CN_arr(info.maxtime + 1, 4, 0.0);
+	wakePtr = wakePtr_arr.data();
+	CDi_DVE = CDi_DVE_vec.data();
+	CN = CN_arr.data();
 
 	//initalizing
 	for(i=0; i<info.maxtime; i++)
@@ -548,14 +551,10 @@ int *pivot;				//holds information for pivoting D
 //===================================================================//
 
 
-	//free allocated memory
-	FREE1D(&R,info.Dsize);
-	FREE2D(&D,info.Dsize,info.Dsize);
-	FREE1D(&pivot,info.Dsize);
-
-	FREE1D(&CDi_DVE,info.maxtime+1);
-	FREE2D(&CN,info.maxtime+1,4);
-	FREE2D(&wakePtr,info.maxtime+1,info.nospanelement);
+	//reset global pointers (memory automatically managed by RAII containers)
+	wakePtr = nullptr;
+	CDi_DVE = nullptr;
+	CN = nullptr;
 	
 	//returning the residual moment coefficient
 	return(CM_resid);

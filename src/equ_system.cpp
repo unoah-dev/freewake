@@ -34,15 +34,14 @@ void FlexWingVortDist(const GENERAL info,const PANEL *panelPtr,\
 void DVE_Resultant(const GENERAL,const PANEL *,const DVE *,DVE **,\
 				   const int,double *);
 
-	double *x;
 	int m,n;
 
 	//computes resultant vector.
 	DVE_Resultant(info,panelPtr,surfacePtr,wakePtr,timestep,R);
 
-	ALLOC1D(&x,(info.Dsize));		//frees memory allocated for A
+	std::vector<double> x(info.Dsize);
 
-	GaussSolve(D,R,info.Dsize,x);	//subroutine in gauss.cpp
+	GaussSolve(D,R,info.Dsize,x.data());	//subroutine in gauss.cpp
 
 	//assigns circulation coefficients A, B, and C
 	for(n=0;n<info.noelement;n++)
@@ -53,7 +52,6 @@ void DVE_Resultant(const GENERAL,const PANEL *,const DVE *,DVE **,\
 		surfacePtr[n].C=x[m+2];
 //#printf("A= %lf\tB= %lf\tC= %lf\n",x[m],x[m+1],x[m+2]);//##
 	}
-	FREE1D(&x,(info.Dsize));		//frees memory allocated for A
 }
 //===================================================================//
 		//END FlexWingVortDist
@@ -407,7 +405,6 @@ void KinematicCond(const BOUND_VORTEX *,const GENERAL,const PANEL *,double **);
 
 int n, m;					//counter
 int Dsize=info.Dsize;		//size of matrix D
-double *x;					//temporary vector with Vorticity coefficients A,B,C
 
 	//assmebly of resultant vector R
 	Resultant(elementPtr,info,R);
@@ -423,7 +420,7 @@ double *x;					//temporary vector with Vorticity coefficients A,B,C
 	KinematicCond(elementPtr,info,panelPtr,D);
 						//subroutine in equ_system.cpp
 	//Solves D x = R equation system with Gaussian elimination
-	ALLOC1D(&x,(Dsize)); //allocates memory for x
+	std::vector<double> x(Dsize); //allocates memory for x
 
  /*  ###########################################################
  //save D matrix and resultant vector R in file D_matrix.txt
@@ -447,7 +444,7 @@ double *x;					//temporary vector with Vorticity coefficients A,B,C
  fclose(fp);
  //###########################################################//*/
 
-	GaussSolve(D,R,Dsize,x);
+	GaussSolve(D,R,Dsize,x.data());
 						//subroutine in gauss.cpp
 
 	//assigns circulation coefficients A, B, and C
@@ -459,7 +456,6 @@ double *x;					//temporary vector with Vorticity coefficients A,B,C
 		elementPtr[n].C=x[m+2];
 //#printf("A= %lf\tB= %lf\tC= %lf\n",x[m],x[m+1],x[m+2]);//##
 	}
-	FREE1D(&x,(Dsize));		//frees memory allocated for A
 }
 //===================================================================//
 		//END Vorticity_Distribution

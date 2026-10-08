@@ -48,13 +48,20 @@ void LongitudinalTrim(GENERAL info,PANEL *panelPtr,DVE *surfaceDVEPtr,int HTpane
 	FILE *spaninfo;			//output file for spanwise information
 	char filename[133];	//file path and name for spanwise information
 
-	//allocating memory	
-	ALLOC1D(&cl,info.noelement);	//section lift coefficient
-   	ALLOC1D(&cy,info.nospanelement);	//section side force coefficient
-   	ALLOC1D(&S,info.nospanelement);	//section area
-   	ALLOC1D(&cd,info.nospanelement);	//section ind. drag coefficient
-	ALLOC2D(&N_force,info.noelement,6);	//surface DVE normal forces
-	ALLOC1D(&D_force,info.nospanelement);//Drag force per span element
+	//allocating memory using modern RAII containers
+	std::vector<double> cl_vec(info.noelement);
+	std::vector<double> cy_vec(info.nospanelement);
+	std::vector<double> S_vec(info.nospanelement);
+	std::vector<double> cd_vec(info.nospanelement);
+	std::vector<double> D_force_vec(info.nospanelement);
+	Array2D<double> N_force_arr(info.noelement, 6);
+
+	cl = cl_vec.data();
+	cy = cy_vec.data();
+	S = S_vec.data();
+	cd = cd_vec.data();
+	D_force = D_force_vec.data();
+	N_force = N_force_arr.data();
 	
 	//initial HT incident correction
 	epsilonHT = 0;//panelPtr[i].eps1;  	//[rad]
@@ -224,15 +231,6 @@ void LongitudinalTrim(GENERAL info,PANEL *panelPtr,DVE *surfaceDVEPtr,int HTpane
 	fprintf(MomSol,"%6.3lf %12.8lf  %7.4lf  ",CL,CDi,CM_resid);
 	fprintf(MomSol,"%10.6lf  %8.4lf\n",CLht,info.CMoWing);
 	fflush(MomSol);
-
-
-
-FREE2D(&N_force,info.noelement,6);
-FREE1D(&D_force,info.nospanelement);
-FREE1D(&cl,info.nospanelement);	//section lift coefficient
-FREE1D(&cy,info.nospanelement);	//section side force coefficient
-FREE1D(&S,info.nospanelement);	//section area
-FREE1D(&cd,info.nospanelement);	//section side force coefficient
 
 printf("\n");
 }

@@ -64,10 +64,8 @@ double tempA[3],tempB[3],tempS;
 double tempProj[3],tempTE[3];
 int type;					//type of wake DVE
 DVE tempDVE;				//temporary DVE
-Wing *FluegelPtr;			//max. five Fluegel (German for wing), struct. Wing
-
-
-	ALLOC1D(&FluegelPtr,info.nowing);
+	std::vector<Wing> Fluegel(info.nowing); //max. five Fluegel (German for wing), struct. Wing
+	Wing *FluegelPtr = Fluegel.data();
 
 //===================================================================//
 		//START determining first and last panel of each wing
