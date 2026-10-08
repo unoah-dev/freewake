@@ -1,3 +1,6 @@
+#pragma once
+
+
 #include "../src/read_input.cpp"
 #include "../src/wing_geometry.cpp"
 #include "../src/induced_velocity.cpp"

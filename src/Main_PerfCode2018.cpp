@@ -50,8 +50,7 @@ int i,ii,a,a2;		//loop counters, max AOA increment
 
 
 	double tempS;
-	char answer ;
-	char filename[137];	//file path and name
+	char answer;
 
 	//Input/output files
 	FILE *AD;			//airfoil data file
@@ -275,18 +274,16 @@ cn = cn_vec.data();
 	for(airfoil=0;airfoil<info.noairfoils;airfoil++)
 	{
 		//resolves airfoil data file path
-		std::string afPath = config.getAirfoilFilePath(airfoil);
-		strncpy(filename, afPath.c_str(), sizeof(filename) - 1);
-		filename[sizeof(filename) - 1] = '\0';
+		std::filesystem::path afPath = config.getAirfoilFilePath(airfoil);
 
 		// checks if airfoil file exists
-		if ((AD = fopen(filename, "r"))== NULL) {
+		if ((AD = fopen(afPath.string().c_str(), "r"))== NULL) {
 			printf("Airfoil file %d could not be opened:\n",airfoil+1);
 			exit(1);
 		}
 
 		//opens airfoil file
-		AD = fopen(filename, "r");
+		AD = fopen(afPath.string().c_str(), "r");
 		
 		//read in number of rows
 		do	
@@ -328,9 +325,9 @@ cn = cn_vec.data();
 
 	//Trim itereation
 	//creates file "TrimSol.txt in directory "output"
-	sprintf(filename,"%s%s",OUTPUT_PATH,"TrimSol.txt");
+	auto trimPath = resolve_output_file("TrimSol.txt");
 	//open output file
-	MomSol = fopen(filename, "w");
+	MomSol = fopen(trimPath.string().c_str(), "w");
 
 	//write header
 	fprintf(MomSol,"cmac= %lf  ",info.cmac);
@@ -340,9 +337,9 @@ cn = cn_vec.data();
 
 	//Performance results
 	//creates file "Performance.txt in directory "output"
-	sprintf(filename,"%s%s",OUTPUT_PATH,"Performance.txt");
+	auto perfPath = resolve_output_file("Performance.txt");
 	//open output file
-	Performance = fopen(filename, "w");
+	Performance = fopen(perfPath.string().c_str(), "w");
 
 	//write header
 	fprintf(Performance,"Output file of performance calculations\n");

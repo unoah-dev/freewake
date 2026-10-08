@@ -38,11 +38,20 @@ void Delete_timestep()
 {
 	//deletes previous timestep files
 
-	char comand[160];	//system command to delete previous timestep files
 
 	//deletes previous timestep files
-	sprintf(comand,"%s%s%s","del ",OUTPUT_PATH,"timestep*");
-	system(comand);
+	namespace fs = std::filesystem;
+	std::error_code ec;
+	if (fs::exists(OUTPUT_PATH, ec)) {
+		for (const auto& entry : fs::directory_iterator(OUTPUT_PATH, ec)) {
+			if (entry.is_regular_file()) {
+				std::string fname = entry.path().filename().string();
+				if (fname.rfind("timestep", 0) == 0) {
+					fs::remove(entry.path(), ec);
+				}
+			}
+		}
+	}
 }
 //===================================================================//
 		//END OF File_Initializing
@@ -56,11 +65,10 @@ void Save_Elementary_Wings(const GENERAL info,const BOUND_VORTEX* elementPtr)
 
 	int l;			//loop counter
 	FILE *fp;		//output file
-	char filename[137];	//file path and name
 
 	//creates file "Elementary_Wings.txt in directory "output"
-	sprintf(filename,"%s%s",OUTPUT_PATH,"Elementary_Wings.txt");
-	fp = fopen(filename, "w");
+	auto filePath = resolve_output_file("Elementary_Wings.txt");
+	fp = fopen(filePath.string().c_str(), "w");
 
 	//writes header
 	fprintf(fp,"\n\n\nProgram Version: %s\n",PROGRAM_VERSION);
@@ -106,11 +114,10 @@ void Save_Trailing_Edge(const GENERAL info,const BOUND_VORTEX* trailedgePtr)
 
 	int l;			//loop counter
 	FILE *fp;		//output file
-	char filename[137];	//file path and name
 
 	//opens file for appending
-	sprintf(filename,"%s%s",OUTPUT_PATH,"Elementary_Wings.txt");
-	fp = fopen(filename, "a");
+	auto filePath = resolve_output_file("Elementary_Wings.txt");
+	fp = fopen(filePath.string().c_str(), "a");
 
 	//writes header
 	fprintf(fp,"\n\n\nProgram Version: %s\n",PROGRAM_VERSION);
@@ -152,11 +159,10 @@ void Horstmann_Results(const GENERAL info,const BOUND_VORTEX* elementPtr,\
 	double tempS;
 	double cl,cy,cn;  //temporary stores for cl, cy, and cn
 	FILE *fp;			//output file
-	char filename[126];	//file path and name
 
 	//creates file "output\results.txt"
-	sprintf(filename,"%s%s",OUTPUT_PATH,"results.txt");
-	fp = fopen(filename, "w"); 			//###/
+	auto filePath = resolve_output_file("results.txt");
+	fp = fopen(filePath.string().c_str(), "w");
 
 	fprintf(fp,"\n\n\nProgram Version: %s\n",PROGRAM_VERSION);
 	fprintf(fp,"Results with Horstmann's method, fixed wake\n");
@@ -272,11 +278,10 @@ void Header(const GENERAL info,const BOUND_VORTEX* elementPtr,\
 	int i;				//loop counter
 //	double tempS;
 	FILE *fp;			//output file
-	char filename[126];	//file path and name
 
 	//creates file "output\results.txt"
-	sprintf(filename,"%s%s",OUTPUT_PATH,"results.txt");
-	fp = fopen(filename, "w"); 			//###/
+	auto filePath = resolve_output_file("results.txt");
+	fp = fopen(filePath.string().c_str(), "w");
 
 	fprintf(fp,"\n\n\nProgram Version: %s\n",PROGRAM_VERSION);
 
@@ -338,11 +343,10 @@ void Time_Stepping_Results(const GENERAL info,int const first, int const last,\
 	int i;				//loop counter
 	double time,CDi_ellipt,e;
 	FILE *fp;			//output file
-	char filename[126];	//file path and name
 
 	//creates file "output\results.txt"
-	sprintf(filename,"%s%s",OUTPUT_PATH,"results.txt");
-	fp = fopen(filename, "a"); 			//###/
+	auto filePath = resolve_output_file("results.txt");
+	fp = fopen(filePath.string().c_str(), "a");
 
 /*	//header
 	fprintf(fp,"\n\n\nProgram Version: %s\n",PROGRAM_VERSION);
@@ -390,11 +394,10 @@ void Time_Stepping_End_Results(const GENERAL info,const int steps,\
 	int i,first;				//loop counter
 	double time,CDi_ellipt,e;
 	FILE *fp;			//output file
-	char filename[126];	//file path and name
 
 	//creates file "output\results.txt"
-	sprintf(filename,"%s%s",OUTPUT_PATH,"results.txt");
-	fp = fopen(filename, "a"); 			//###/
+	auto filePath = resolve_output_file("results.txt");
+	fp = fopen(filePath.string().c_str(), "a");
 
 	first=int(timestep/steps+0.5);
 
@@ -427,11 +430,10 @@ void Save_Surface_DVEs(const GENERAL info,const DVE *surfacePtr)
 
 	int l;			//loop counter
 	FILE *fp;		//output file
-	char filename[132];	//file path and name
 
 	//creates file "output\Surface_DVE.txt"
-	sprintf(filename,"%s%s",OUTPUT_PATH,"Surface_DVE.txt");
-	fp = fopen(filename, "w");
+	auto filePath = resolve_output_file("Surface_DVE.txt");
+	fp = fopen(filePath.string().c_str(), "w");
 
 	//writes header
 	fprintf(fp,"\n\n\nProgram Version: %s\n",PROGRAM_VERSION);
@@ -474,13 +476,12 @@ void Save_Timestep(const GENERAL info,const int timestep,DVE **wakePtr,\
 
 	int time,span;		//loop counter
 	FILE *fp;			//output file
-	char filename[133];	//file path and name
 
 	//creates file name timestep##.txt ## is number of timestep
-	sprintf(filename,"%s%s%d%s",OUTPUT_PATH,"timestep",timestep,".txt");
+	auto filePath = resolve_output_file("timestep" + std::to_string(timestep) + ".txt");
 
 	//creates file in subdirectory output
-	fp = fopen(filename, "w");
+	fp = fopen(filePath.string().c_str(), "w");
 
 	//writes header
 	fprintf(fp,"\n\n\nProgram Version: %s\n",PROGRAM_VERSION);
@@ -619,13 +620,12 @@ void Save_SurfaceDVE_Loads(const GENERAL info,const int timestep,\
 
 	int time,span;		//loop counter
 	FILE *fp;			//output file
-	char filename[133];	//file path and name
 
 	//creates file name timestep##.txt ## is number of timestep
-	sprintf(filename,"%s%s%d%s",OUTPUT_PATH,"SDVE_loads",timestep,".txt");
+	auto filePath = resolve_output_file("SDVE_loads" + std::to_string(timestep) + ".txt");
 
 	//creates file in subdirectory output
-	fp = fopen(filename, "w");
+	fp = fopen(filePath.string().c_str(), "w");
 
 	//writes header
 	fprintf(fp,"\n\n\nProgram Version: %s\n",PROGRAM_VERSION);
@@ -710,13 +710,12 @@ void Test(const GENERAL info,double **D,const double *R)
  //  ###########################################################
  //save D matrix and resultant vector R in file D_matrix.txt
  int m,n;
-char filename[133];	//file path and name
  FILE *fp;
 
 	//creates file name timestep##.txt ## is number of timestep
-	sprintf(filename,"%s%s",OUTPUT_PATH,"test.txt");
+	auto filePath = resolve_output_file("test.txt");
 
-	 fp = fopen(filename, "a");
+	fp = fopen(filePath.string().c_str(), "a");
 	 //writes header line
 	 fprintf(fp, "\t");
 	 for(m=0; m<info.Dsize; m++)

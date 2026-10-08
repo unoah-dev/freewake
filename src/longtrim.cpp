@@ -46,7 +46,6 @@ void LongitudinalTrim(GENERAL info,PANEL *panelPtr,DVE *surfaceDVEPtr,int HTpane
 	double *cd;	//section ind. drag coefficient
 
 	FILE *spaninfo;			//output file for spanwise information
-	char filename[133];	//file path and name for spanwise information
 
 	//allocating memory using modern RAII containers
 	std::vector<double> cl_vec(info.noelement);
@@ -162,10 +161,12 @@ void LongitudinalTrim(GENERAL info,PANEL *panelPtr,DVE *surfaceDVEPtr,int HTpane
 //			save spanwise information, lift and drag distribution
 //===================================================================//
 	//creates file name AOA#.##.txt ## is angle of attack
-	sprintf(filename,"%s%s%.2lf%s",OUTPUT_PATH,"AOA",info.alpha*RtD,".txt");
+	char aoa_buf[64];
+	std::snprintf(aoa_buf, sizeof(aoa_buf), "AOA%.2lf.txt", info.alpha*RtD);
+	auto aoaPath = resolve_output_file(aoa_buf);
 
 	//creates file in subdirectory output
-	spaninfo = fopen(filename, "w");
+	spaninfo = fopen(aoaPath.string().c_str(), "w");
 
 	//write header
 	fprintf(spaninfo,"This file contains spanwise information at");

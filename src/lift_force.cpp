@@ -12,6 +12,42 @@ void Wing_Normal_Forces(const  PANEL* ,const GENERAL,const BOUND_VORTEX*,\
 						double [2],double [2],\
 						double &,double &,double &,double &);
 
+#include <tuple>
+#include <array>
+
+//===================================================================//
+// Modern C++17 function returning normal forces and coefficients as std::tuple
+//===================================================================//
+inline std::tuple<std::array<double, 2>, std::array<double, 2>, double, double, double, double>
+Compute_Wing_Normal_Forces(const GENERAL& info, double **N_force)
+{
+  double q = 0.5 * info.Uinf * info.Uinf * info.S;
+  std::array<double, 2> Nt_free = {0.0, 0.0};
+  std::array<double, 2> Nt_ind = {0.0, 0.0};
+
+  for (int l = 0; l < info.noelement; l++)
+  {
+	  Nt_free[0] += N_force[l][0];
+	  Nt_free[1] += N_force[l][2];
+	  Nt_ind[0]  += N_force[l][1];
+	  Nt_ind[1]  += N_force[l][3];
+  }
+
+  if (info.sym == 1 && info.beta == 0)
+  {
+	  Nt_free[0] *= 2.0;
+	  Nt_ind[0]  *= 2.0;
+	  Nt_ind[1]  *= 2.0;
+  }
+
+  double CL  = (Nt_free[0] + Nt_ind[0]) / q;
+  double CY  = (Nt_free[1] + Nt_ind[1]) / q;
+  double CLi = Nt_ind[0] / q;
+  double CYi = Nt_ind[1] / q;
+
+  return {Nt_free, Nt_ind, CL, CLi, CY, CYi};
+}
+
 //===================================================================//
 		//START FUNCTION DVE_Wing_Normal_Forces
 //===================================================================//
@@ -19,67 +55,15 @@ void DVE_Wing_Normal_Forces(const GENERAL info,double **N_force,\
 							double Nt_free[2], double Nt_ind[2],\
 							double &CL,double &CLi,double &CY,double &CYi)
 {
-//this routine adds up the DVE's normal forces in order to compute the
-//total wing normal forces/density and coefficients based on free stream
-//input:
-// info		general information on case
-// N_force	normal forces/density of each surface DVE, second index is:
-//			[0]: free stream lift, [1]: induced lift,
-//			[2]: free stream side, [3]: induced side force/density
-
-//
-//ouput:
-// as part of surfacePtr.:
-// N_free	total lift and side forces/density due to free stream flow
-// N_ind	total lift and side forces/density due to induced velocities
-//
-// Nt_free	total lift and side forces/density due to free stream flow
-// Nt_ind	total lift and side forces/density due to induced velocities
-// CL		total lift coefficient
-// CLi		total induced lift coefficient
-// CY		total side-force coefficient
-// CYi		total induced side-force coefficient
-
-  int l=0;									//counter
-  double q=0.5*info.Uinf*info.Uinf*info.S; 	//ref. area* dyn. pressure/density
-
-  Nt_free[0]=0;
-  Nt_free[1]=0;
-  Nt_ind[0]=0;
-  Nt_ind[1]=0;
-
-  //loop over number of panels
-  for (l=0;l<info.noelement;l++)
-  {
-	  //adding the normal forces/density of all elementary wings
-	  Nt_free[0]	+=  N_force[l][0];
-	  Nt_free[1]	+=  N_force[l][2];
-
-	  Nt_ind[0]	+=  N_force[l][1];
-	  Nt_ind[1]	+=  N_force[l][3];;
-
-//#printf("NtX  =%lf\t NtZ  =%lf\n",Nt_free[0],Nt_free[1]);//#
-//#printf("NtXi =%lf\t NtZi =%lf\n",Nt_ind[0],Nt_ind[1]);//#
-  }
-
-  if (info.sym==1 && info.beta == 0)
-  {	//twice the force if symmetric geometry
-	  Nt_free[0]*=2;
-
-	  Nt_ind[0]	*=2;
-  	  Nt_ind[1]	*=2;
-//#printf("NtX  =%lf\t NtZ  =%lf\n",Nt_free[0],Nt_free[1]);//#
-  }
-  //total lift and side force coefficients
-  CL = (Nt_free[0]+Nt_ind[0])/q;
-  CY = (Nt_free[1]+Nt_ind[1])/q;
-
-  //total induced lift and side force coefficients
-  CLi = Nt_ind[0]/q;
-  CYi = Nt_ind[1]/q;
-
-//#printf("CL=%lf\tCLi=%lf\tCY=%lf\tCYi=%lf\n",CL,CLi,CY,CYi);//#
-
+  auto [nt_f, nt_i, cl_v, cli_v, cy_v, cyi_v] = Compute_Wing_Normal_Forces(info, N_force);
+  Nt_free[0] = nt_f[0];
+  Nt_free[1] = nt_f[1];
+  Nt_ind[0]  = nt_i[0];
+  Nt_ind[1]  = nt_i[1];
+  CL  = cl_v;
+  CLi = cli_v;
+  CY  = cy_v;
+  CYi = cyi_v;
 }
 //===================================================================//
 		//END FUNCTION DVE_Wing_Normal_Forces

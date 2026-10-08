@@ -1,5 +1,4 @@
-#ifndef CONFIG_HPP
-#define CONFIG_HPP
+#pragma once
 
 #include "typedef.h"
 #include <string>
@@ -107,4 +106,3 @@ struct Config {
     std::string getAirfoilFilePath(int airfoil_index_0based) const;
 };
 
-#endif // CONFIG_HPP

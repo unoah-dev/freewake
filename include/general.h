@@ -1,23 +1,25 @@
 #pragma once
 
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-//#include <iostream.h>
-#include <math.h>
+#include <cstddef>
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
+#include <filesystem>
+#include <string_view>
+#include <algorithm>
 
 #include "typedef.h"
 #include "alloc.h"
 #include "vector_algebra.h"
 #include "ref_frame_transform.h"
 
-#define Pi  3.1415926535897931
-#define DtR Pi/180
-#define RtD 180/Pi
-#define DBL_EPS 1e-14
-#define OUTPUT_PATH "output/"
-#define PROGRAM_VERSION "FreeWake2018_Omega"
-#define AIRFOIL_PATH "airfoils/"
+inline constexpr double Pi = 3.14159265358979323846;
+inline constexpr double DtR = Pi / 180.0;
+inline constexpr double RtD = 180.0 / Pi;
+inline constexpr double DBL_EPS = 1e-14;
+inline const std::filesystem::path OUTPUT_PATH = "output";
+inline const std::filesystem::path AIRFOIL_PATH = "airfoils";
+inline constexpr const char* PROGRAM_VERSION = "FreeWake2018_Omega";
 
 inline double sanitize_zero(double val, double eps = 1e-15)
 {
@@ -25,6 +27,12 @@ inline double sanitize_zero(double val, double eps = 1e-15)
         return 0.0;
     }
     return val;
+}
+
+inline std::filesystem::path resolve_output_file(std::string_view filename)
+{
+    std::filesystem::create_directories(OUTPUT_PATH);
+    return OUTPUT_PATH / filename;
 }
 
 

@@ -47,12 +47,10 @@ tmin = timestep;
 
 //	2. reading in data of timestep
 
-	//creates file name timestep##.txt ## is number of timestep
-//	sprintf(iofile,"%s%s%d%s",OUTPUT_PATH,"timestep",timestep,".txt");
-	sprintf(iofile,"%s%d%s","timestep",timestep,".txt");
+	auto timeFile = resolve_output_file("timestep" + std::to_string(timestep) + ".txt");
 
 	// checks if input file exists
-	if ((fp = fopen(iofile, "r"))== NULL)
+	if ((fp = fopen(timeFile.string().c_str(), "r"))== NULL)
 	{
 		printf("File could not be opened, stupid:\n");
 		exit(1);
@@ -186,10 +184,9 @@ tmin = timestep;
 
 //	3. writing to plotting file (with extension .m)
 
-sprintf(iofile,"%s","wakeplot.m");
-//sprintf(iofile,"%s","wakeplot.m");
+auto plotFile = resolve_output_file("wakeplot.m");
 	//opens input file
-	fp = fopen(iofile, "w");
+	fp = fopen(plotFile.string().c_str(), "w");
 
 //writing header
 	fprintf(fp,"%%\n"); //madatory header line

@@ -523,10 +523,8 @@ double ***uright = uright_arr.data();
 			tempS = 0.01*wakePtr[time][info.wing2[wing]].eta;
 		else//wing has two tips, possibly different in geometry
 		{	//in that case, decay factor is 1% of the shorter half-span
-			if(  wakePtr[time][info.wing1[wing]].eta
-			   < wakePtr[time][info.wing2[wing]].eta)
-						tempS = 0.01*wakePtr[time][info.wing1[wing]].eta;
-			else 		tempS = 0.01*wakePtr[time][info.wing2[wing]].eta;
+			tempS = 0.01 * std::min(wakePtr[time][info.wing1[wing]].eta,
+			                         wakePtr[time][info.wing2[wing]].eta);
 		}
 		//loop over wale DVEs of current timestep
 		for(span=info.wing1[wing];span<=info.wing2[wing];span++)
@@ -1155,13 +1153,8 @@ void New_vorticity_coefficients(const GENERAL info,const PANEL *panePtr,\
 
 
 /*//////////////////
-char filename[133];	//file path and name
- FILE *fp;
-
-	//creates file name timestep##.txt ## is number of timestep
-	sprintf(filename,"%s%s",OUTPUT_PATH,"test.txt");
-
-	 fp = fopen(filename, "a");
+	auto testPath = resolve_output_file("test.txt");
+	FILE *fp = fopen(testPath.string().c_str(), "a");
 
 	fprintf(fp, "\n");
 

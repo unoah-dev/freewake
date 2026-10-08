@@ -287,6 +287,36 @@ double tempS, tempA[3],tempA1[3];	//temporary scalar, array
 		//END FUNCTION Trailing_Edge_Generation
 //===================================================================//
 
+#include <tuple>
+#include <vector>
+
+//===================================================================//
+// Modern C++17 function returning wing boundary vectors as std::tuple
+//===================================================================//
+inline std::tuple<std::vector<int>, std::vector<int>, std::vector<int>, std::vector<int>>
+Identify_Wing_Boundaries(const PANEL* panelPtr, const int nopanel)
+{
+	std::vector<int> w1, w2, p1, p2;
+	int span = 0;
+	for (int k = 0; k < nopanel; ++k) {
+		if (panelPtr[k].left == 0) {
+			w1.push_back(span);
+			p1.push_back(k);
+		}
+		span += panelPtr[k].n;
+	}
+
+	span = -1;
+	for (int k = 0; k < nopanel; ++k) {
+		span += panelPtr[k].n;
+		if (panelPtr[k].right == 0) {
+			w2.push_back(span);
+			p2.push_back(k);
+		}
+	}
+	return {w1, w2, p1, p2};
+}
+
 //===================================================================//
 		//FUNCTION Wing_Generation
 		//identifies separate wings
@@ -294,51 +324,14 @@ double tempS, tempA[3],tempA1[3];	//temporary scalar, array
 void Wing_Generation(const PANEL* panelPtr,const int nopanel,\
 					 int wing1[5],int wing2[5],int panel1[5],int panel2[5])
 {
-	//identifies the separate wings and their span indices of their tips
-	//
-	//input:
-	// 	panel		- information on panels
-	//  nopanel		- number of panels
-	//
-	//ouput:
-	//
-	//	wing1[wing]	- span index of left edge of wing "wing"
-	//	wing2[wing]	- span index of right edge of wing "wing"
-	//	panel1[wing]- index of left panel of wing "wing"
-	//	panel2[wing]- index of right panel of wing "wing"
-	//				panel1 and panel2 added G.B. 11-5-06
-
-int k,span=0,wing=0;						//loop counters, k=0..(panel.n-1)
-
-	//identifies left edges (edge 1) of wings
-	for(k=0;k<nopanel;k++)
-	{
-		//looks at panels left edge (edge 1)
-		if(panelPtr[k].left==0)
-		{
-			wing1[wing]=span;
-			panel1[wing]=k;
-			wing++;			//advance to next wing
-		}
-		span += panelPtr[k].n; //move to next panel
+	auto [w1, w2, p1, p2] = Identify_Wing_Boundaries(panelPtr, nopanel);
+	for (size_t i = 0; i < w1.size() && i < 5; ++i) {
+		wing1[i] = w1[i];
+		panel1[i] = p1[i];
 	}
-
-//identifies right edges (edge 2) of wings
-
-	//initialize
-	wing = 0;
-	span = -1;
-
-	for(k=0;k<nopanel;k++)
-	{
-		span += panelPtr[k].n; //move to next panel
-		//looks at panels left edge (edge 1)
-		if(panelPtr[k].right==0)
-		{
-			wing2[wing]=span;
-			panel2[wing]=k;
-			wing++;			//advance to next wing
-		}
+	for (size_t i = 0; i < w2.size() && i < 5; ++i) {
+		wing2[i] = w2[i];
+		panel2[i] = p2[i];
 	}
 }
 //===================================================================//

@@ -1,7 +1,5 @@
-//***************************************************************************
-#ifndef ALLOC_H
-#define ALLOC_H
-//***************************************************************************
+#pragma once
+
 #include <vector>
 #include <memory>
 #include <array>
@@ -9,14 +7,15 @@
 #include <cstdio>
 #include <cstdlib>
 #include <utility>
-//***************************************************************************
+
 static double my_memory_allocated = 0.0;
 static double my_memory_deleted = 0.0;
 #define GLOBAL_VAR_FOR_ALLOCATION my_memory_allocated
 #define GLOBAL_VAR_FOR_DELETION my_memory_deleted
 
-#define IS_ZERO(x) (fabs(x) < 1.0e-8)
-void myprintf(char *fmt, ...);
+inline bool is_zero(double x, double eps = 1.0e-8) {
+    return std::abs(x) < eps;
+}
 
 inline double TotalMemoryAllocated()  // in bytes
 {
@@ -255,4 +254,3 @@ inline void FREE4D(Etype *****ptr, int m, int n, int o, int p)
     GLOBAL_VAR_FOR_DELETION += 1.0 * (m * sizeof(Etype***) + m * n * sizeof(Etype**) + m * n * o * sizeof(Etype*) + m * n * o * p * sizeof(Etype));
 }
 
-#endif // ALLOC_H

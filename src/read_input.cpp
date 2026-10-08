@@ -564,11 +564,10 @@ void Read_Timestep(const int timestep,DVE *surfaceDVE,DVE **wakeDVE)
 	char ch;			//generic character
 	FILE *fp;			//output file
 
-	//creates file name timestep##.txt ## is number of timestep
-	sprintf(iofile,"%s%s%d%s",OUTPUT_PATH,"timestep",timestep,".txt");
+	auto timeFile = resolve_output_file("timestep" + std::to_string(timestep) + ".txt");
 
 	// checks if input file exists
-	if ((fp = fopen(iofile, "r"))== NULL)
+	if ((fp = fopen(timeFile.string().c_str(), "r"))== NULL)
 	{
 		printf("Output file could not be opened:\n");
 		scanf("%c",&ch);

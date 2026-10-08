@@ -1,6 +1,7 @@
 #include <Eigen/Dense>
 #include <Eigen/LU>
 #include <memory>
+#include <optional>
 #include <cstdio>
 #include <cmath>
 
@@ -9,9 +10,9 @@ namespace {
 }
 
 //===================================================================//
-// START GaussSolve
+// Modern Linear System Solver returning std::optional
 //===================================================================//
-void GaussSolve(double **A, double *R, const int n, double *x)
+std::optional<Eigen::VectorXd> SolveLinearSystem(double **A, double *R, const int n)
 {
     Eigen::MatrixXd mat(n, n);
     for (int i = 0; i < n; ++i) {
@@ -20,14 +21,26 @@ void GaussSolve(double **A, double *R, const int n, double *x)
         }
     }
     Eigen::Map<const Eigen::VectorXd> rhs(R, n);
-    Eigen::Map<Eigen::VectorXd> sol(x, n);
 
     Eigen::PartialPivLU<Eigen::MatrixXd> lu(mat);
-    sol = lu.solve(rhs);
+    Eigen::VectorXd sol = lu.solve(rhs);
     for (int i = 0; i < n; ++i) {
         if (std::abs(sol[i]) < 1e-15 || sol[i] == 0.0) {
             sol[i] = 0.0;
         }
+    }
+    return sol;
+}
+
+//===================================================================//
+// START GaussSolve
+//===================================================================//
+void GaussSolve(double **A, double *R, const int n, double *x)
+{
+    auto sol = SolveLinearSystem(A, R, n);
+    if (sol) {
+        Eigen::Map<Eigen::VectorXd> out(x, n);
+        out = *sol;
     }
 }
 //===================================================================//

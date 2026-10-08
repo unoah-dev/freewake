@@ -54,11 +54,10 @@ int main()
 //read in information about point and time step from matlab file
 //===================================================================//
 
-	//creates file name for file with point information
-	sprintf(iofile,"%s%s",OUTPUT_PATH,"pointinfo.txt");
+	auto pointFile = resolve_output_file("pointinfo.txt");
 
 	// checks if input file exists
-	if ((fp = fopen(iofile, "r"))== NULL)
+	if ((fp = fopen(pointFile.string().c_str(), "r"))== NULL)
 	{
 		printf("File could not be opened, stupid:\n");
 		exit(1);
@@ -89,11 +88,10 @@ int main()
 //===================================================================//
 
 
-	//creates file name timestep##.txt ## is number of timestep
-	sprintf(iofile,"%s%s%d%s",OUTPUT_PATH,"timestep",timestep,".txt");
+	auto timeFile = resolve_output_file("timestep" + std::to_string(timestep) + ".txt");
 
 	// checks if input file exists
-	if ((fp = fopen(iofile, "r"))== NULL)
+	if ((fp = fopen(timeFile.string().c_str(), "r"))== NULL)
 	{
 		printf("File could not be opened, stupid:\n");
 		exit(1);
@@ -236,9 +234,7 @@ int main()
 			tempS = 0.01*surfaceDVE[span].eta;
 		else//wing has two tips, possibly different in geometry
 		{	//in that case, decay factor is 1% of the shorter half-span
-			if(  surfaceDVE[k].eta < surfaceDVE[span].eta)
-						tempS = 0.01*surfaceDVE[k].eta;
-			else 		tempS = 0.01*surfaceDVE[span].eta;
+			tempS = 0.01 * std::min(surfaceDVE[k].eta, surfaceDVE[span].eta);
 		}
 
 		//loop over surface DVEs of current wing
@@ -306,16 +302,10 @@ int main()
 
 
 // Create Output file
-sprintf(iofile,"%s%s",OUTPUT_PATH,"velocityinfo.txt");
+auto velFile = resolve_output_file("velocityinfo.txt");
 
-	// checks if input file exists
-	// if ((fp = fopen(iofile, "r"))== NULL)
-	//{
-	//	printf("File could not be opened, stupid:\n");
-	//	exit(1);
-	//}
 // Open output file and write w_ind	
- fs = fopen(iofile,"w");
+ fs = fopen(velFile.string().c_str(),"w");
 
  fprintf(fs,"%d\n",numpoints);
 
