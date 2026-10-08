@@ -1,0 +1,182 @@
+# ==============================================================================
+# FreeWake Configuration File
+# Modern YAML replacement for legacy input.txt
+# ==============================================================================
+
+simulation:
+  # Wake relaxation: true (1) = relaxed wake, false (0) = rigid/prescribed wake
+  relaxed_wake: false
+  # Aerodynamics solver: 1 = steady, 2 = unsteady (quasi-unsteady)
+  aerodynamics: 1
+  # Viscous corrections: true (1) = viscous (profile drag), false (0) = inviscid
+  viscous: true
+  # Symmetrical geometry: true (1) = model right wing only, false (0) = full geometry
+  symmetrical: false
+  # Longitudinal trim calculation: true (1) = trim solver active (m must be 1), false (0) = off
+  longitudinal_trim: false
+  # Maximum number of time steps
+  max_time_steps: 20
+  # Time step width (seconds)
+  time_step_size: 2.5
+  # Convergence delta-span efficiency criteria (0.0 if time-stepping only)
+  convergence_delta_e: 0.0
+
+flow_conditions:
+  # Freestream velocity (m/s)
+  freestream_velocity: 11.0
+  # Angle of attack sweep: start, end, step size in degrees
+  alpha_sweep:
+    start_deg: 0.0
+    end_deg: 10.0
+    step_deg: 2.0
+  # Sideslip angle in degrees
+  sideslip_angle_deg: 0.0
+  # Fluid density (kg/m^3)
+  density: 1000.0
+  # Fluid kinematic viscosity (m^2/s)
+  kinematic_viscosity: 1.307e-06
+
+reference:
+  # Reference wing area (m^2)
+  area: 0.0885
+  # Reference wing span (m)
+  span: 0.6
+  # Mean aerodynamic chord (m)
+  mean_aerodynamic_chord: 0.1
+  # Aircraft total weight (N)
+  aircraft_weight: 801.0
+  # Center of Gravity location [x, y, z] (m)
+  cg_location: [0.0, 0.0, 0.0]
+  # Initial wing zero-lift pitching moment coefficient
+  wing_cmo: -0.1
+
+geometry:
+  # Number of distinct wings (e.g., main wing, horizontal tail)
+  num_wings: 2
+  # Number of chordwise lifting lines (m)
+  num_chordwise_lifting_lines: 3
+  # Lifting surface panels definition
+  # Boundary Condition flags:
+  #   10 (or 010) = Symmetry line / Centerline
+  #   220         = Interior panel-to-panel junction
+  #   100         = Free end / Wingtip
+  panels:
+    - id: 1
+      num_spanwise_elements: 3
+      neighbors:
+        left: 0
+        right: 2
+      left_edge:
+        coordinates: [0.000, 0.000, 0.000]
+        chord: 0.201
+        incidence_deg: 0.000
+        boundary_condition: 10
+        airfoil: 7
+      right_edge:
+        coordinates: [0.020, 0.060, 0.000]
+        chord: 0.188
+        incidence_deg: 0.000
+        boundary_condition: 220
+        airfoil: 7
+
+    - id: 2
+      num_spanwise_elements: 3
+      neighbors:
+        left: 1
+        right: 3
+      left_edge:
+        coordinates: [0.020, 0.060, 0.000]
+        chord: 0.188
+        incidence_deg: 0.000
+        boundary_condition: 220
+        airfoil: 7
+      right_edge:
+        coordinates: [0.066, 0.140, -0.003]
+        chord: 0.160
+        incidence_deg: 0.000
+        boundary_condition: 220
+        airfoil: 7
+
+    - id: 3
+      num_spanwise_elements: 4
+      neighbors:
+        left: 2
+        right: 4
+      left_edge:
+        coordinates: [0.066, 0.140, -0.003]
+        chord: 0.160
+        incidence_deg: 0.000
+        boundary_condition: 220
+        airfoil: 7
+      right_edge:
+        coordinates: [0.123, 0.220, -0.011]
+        chord: 0.126
+        incidence_deg: 0.000
+        boundary_condition: 220
+        airfoil: 7
+
+    - id: 4
+      num_spanwise_elements: 4
+      neighbors:
+        left: 3
+        right: 0
+      left_edge:
+        coordinates: [0.123, 0.220, -0.011]
+        chord: 0.126
+        incidence_deg: 0.000
+        boundary_condition: 220
+        airfoil: 7
+      right_edge:
+        coordinates: [0.223, 0.300, -0.034]
+        chord: 0.054
+        incidence_deg: 0.000
+        boundary_condition: 100
+        airfoil: 7
+
+    - id: 5
+      num_spanwise_elements: 4
+      neighbors:
+        left: 0
+        right: 0
+      left_edge:
+        coordinates: [0.780, 0.000, 0.000]
+        chord: 0.080
+        incidence_deg: 0.000
+        boundary_condition: 10
+        airfoil: 7
+      right_edge:
+        coordinates: [0.800, 0.200, 0.000]
+        chord: 0.070
+        incidence_deg: 0.000
+        boundary_condition: 100
+        airfoil: 7
+
+vertical_tail:
+  # Vertical tail panels (max 5)
+  panels: []
+
+fuselage:
+  # Fuselage section definition (max 20 sections)
+  section_width: 0.000
+  transition_panel: 0
+  sections: []
+
+drag:
+  # Interference drag percentage (e.g. 0.0% = 0.0)
+  interference_drag_percent: 0.0
+
+airfoils:
+  # Number of airfoil characteristic polar files
+  count: 8
+  # Directory where airfoil polar files are located
+  directory: "airfoils/"
+  # Explicit list of airfoil files
+  files:
+    - "airfoils/airfoil1.dat"
+    - "airfoils/airfoil2.dat"
+    - "airfoils/airfoil3.dat"
+    - "airfoils/airfoil4.dat"
+    - "airfoils/airfoil5.dat"
+    - "airfoils/airfoil6.dat"
+    - "airfoils/airfoil7.dat"
+    - "airfoils/airfoil8.dat"

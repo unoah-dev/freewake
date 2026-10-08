@@ -1,3 +1,5 @@
+#pragma once
+
 // sign convention according to Horstmann' thesis
 
 // definition of type general //

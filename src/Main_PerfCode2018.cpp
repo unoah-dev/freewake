@@ -1,6 +1,10 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "../include/general.h"
 #include "../include/PerfCode.h"
+#include "../include/Config.hpp"
+#include <iostream>
+#include <string>
+#include <cstring>
 
 int i,ii,a,a2;		//loop counters, max AOA increment
 	int k,l,m;			//loop counters
@@ -57,7 +61,7 @@ int i,ii,a,a2;		//loop counters, max AOA increment
 
 
 
-int main()
+int main(int argc, char *argv[])
 
 {
 // This program computes the drag of an aircraft configuration.
@@ -142,60 +146,19 @@ printf("========================================================================
 //						   info.m,info.nopanel);
 //						   //Subroutine in read_input.cpp
 
-	General_Info_from_File(info,alpha1,alpha2,alphastep);
-						   //Subroutine in read_input.cpp
+	std::string configFile = (argc > 1) ? argv[1] : "input.yaml";
+	Config config;
+	std::vector<PANEL> panel_vec;
 
-	info.AR = info.b*info.b/info.S;  //reference aspect ratio
-
-	//allocates memory for panel information in 'panelPtr'
-	//for 'nopanel'-number panels
-	std::vector<PANEL> panel_vec(info.nopanel);
-	panelPtr = panel_vec.data();
-
-
-//printf("\n\n\t\t!!!Only ONE CHORDWISE ROW OF SURFACE DVES!!\n");
-//printf("\t\t\t\tThat means m=1!!\n");
-//printf("\n\n\t\t\t!!!ONLY TWO WINGSS!!\n");
-//printf("\t\tThat means one main wing and one horizontal tail!!\n");
-//printf("\t\t\t\tG.B. 8-8-2007\n");
-//info.m=1;  //no. of chordwise surface DVEs fixed to one, G.B. 3-5-2007
-
-
-	//reads from input file panel information.
-	//For each panel in panelPtr:
-	//	x2[]		-x,y,z coordinates of leading edge corners
-	//	c1,c2		-chord length of panel sides
-	//	eps1, eps2	-incident angle of panel sides
-	//	u1[], u2[]	-local free stream velocities at panel sides
-	//	BC1, BC2	-boundary conditions at panel sides.
-	//				 see typedef.h for more info on Boundary Conditions
-	//	n 			-number of elements in chord direction
-	//  left, right	-neighboring panels
-	Panel_Info_from_File(panelPtr, info);	//Subroutine in read_input.cpp
-
-
-//===================================================================//
-		//END read general and panel info from file 'input.txt'
-//===================================================================//
-
-//===================================================================//
-		//Start read V-tial and fuselage info from file 'input.txt'
-//===================================================================//
-//max of 5 VT panesl!!
-//double VTchord[5],VTarea[5];	//chord and aera of VT panel
-//int VTairfoil[5];
-//max of 20 fuselage sections
-//double FusSectS[20];		//fuselage section area
-//double delFus;				//width of each section
-//int FusLT;					//fuselage section where turbulent
-//double IFdrag;					//interfernce drag fraction
-
-	VT_Fus_Info\
-	(info,VTchord,VTarea,VTairfoil,FusSectS,delFus,FusLT,IFdrag);
-								//Subroutine in read_input.cpp
-//===================================================================//
-		//END read V-tial and fuselage info from file 'input.txt'
-//===================================================================//
+	try {
+		config = Config::loadFromFile(configFile);
+		config.apply(info, alpha1, alpha2, alphastep, panel_vec,
+					 VTchord, VTarea, VTairfoil, FusSectS, delFus, FusLT, IFdrag);
+		panelPtr = panel_vec.data();
+	} catch (const std::exception& e) {
+		std::cerr << "\n[FreeWake Error]: " << e.what() << "\n" << std::endl;
+		return 1;
+	}
 
 //===================================================================//
 //*******************************************************************//
@@ -311,8 +274,10 @@ cn = cn_vec.data();
 	//read airfoil data	
 	for(airfoil=0;airfoil<info.noairfoils;airfoil++)
 	{
-		//creates file name airfoil##.dat ## is the number of the airfoil
-		sprintf(filename,"%s%s%d%s",AIRFOIL_PATH,"airfoil",airfoil+1,".dat");
+		//resolves airfoil data file path
+		std::string afPath = config.getAirfoilFilePath(airfoil);
+		strncpy(filename, afPath.c_str(), sizeof(filename) - 1);
+		filename[sizeof(filename) - 1] = '\0';
 
 		// checks if airfoil file exists
 		if ((AD = fopen(filename, "r"))== NULL) {
