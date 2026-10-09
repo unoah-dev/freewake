@@ -1,5 +1,5 @@
-#include "../include/general.h"
-#include "../include/PerfCode.h"
+#include "freewake/general.hpp"
+#include "freewake/perf_code.hpp"
 main()
 {
 //This program plots the wake of a wake step.

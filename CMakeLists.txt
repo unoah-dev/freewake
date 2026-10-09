@@ -49,16 +49,38 @@ FetchContent_MakeAvailable(yaml-cpp)
 
 # FreeWake executable target
 add_executable(FreeWake
-    src/Main_PerfCode2018.cpp
-    src/Config.cpp
-    include/Config.hpp
-    include/FreeWakeWing.h
-    include/PerfCode.h
-    include/alloc.h
-    include/general.h
-    include/ref_frame_transform.h
-    include/typedef.h
-    include/vector_algebra.h
+    src/main_perf_code.cpp
+    src/config.cpp
+    src/drag_force.cpp
+    src/equation_system.cpp
+    src/gauss.cpp
+    src/induced_velocity.cpp
+    src/lift_force.cpp
+    src/longtrim.cpp
+    src/pitch_moment.cpp
+    src/read_input.cpp
+    src/wake_geometry.cpp
+    src/wing_geometry.cpp
+    src/write_output.cpp
+    include/freewake/alloc.hpp
+    include/freewake/config.hpp
+    include/freewake/drag_force.hpp
+    include/freewake/equation_system.hpp
+    include/freewake/freewake_wing.hpp
+    include/freewake/gauss.hpp
+    include/freewake/general.hpp
+    include/freewake/induced_velocity.hpp
+    include/freewake/lift_force.hpp
+    include/freewake/longtrim.hpp
+    include/freewake/perf_code.hpp
+    include/freewake/pitch_moment.hpp
+    include/freewake/read_input.hpp
+    include/freewake/ref_frame_transform.hpp
+    include/freewake/typedef.hpp
+    include/freewake/vector_algebra.hpp
+    include/freewake/wake_geometry.hpp
+    include/freewake/wing_geometry.hpp
+    include/freewake/write_output.hpp
 )
 
 # Target-scoped include directories

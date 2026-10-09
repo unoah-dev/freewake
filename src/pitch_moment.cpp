@@ -1,3 +1,17 @@
+#include "freewake/pitch_moment.hpp"
+#include "freewake/general.hpp"
+#include "freewake/drag_force.hpp"
+#include "freewake/lift_force.hpp"
+#include "freewake/wing_geometry.hpp"
+#include "freewake/equation_system.hpp"
+#include "freewake/gauss.hpp"
+#include "freewake/wake_geometry.hpp"
+#include "freewake/write_output.hpp"
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
+
+
 //computes pitching moment
 double PitchingMoment(const GENERAL,PANEL *,const double,DVE *&,\
 						const double,const int,const double [3],\

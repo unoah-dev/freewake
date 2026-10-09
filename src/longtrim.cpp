@@ -1,3 +1,16 @@
+#include "freewake/longtrim.hpp"
+#include "freewake/general.hpp"
+#include "freewake/equation_system.hpp"
+#include "freewake/pitch_moment.hpp"
+#include "freewake/wing_geometry.hpp"
+#include "freewake/drag_force.hpp"
+#include "freewake/lift_force.hpp"
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
+#include <vector>
+
+
 void LongitudinalTrim(GENERAL,PANEL *,DVE *,int,double *&,double &,\
 						double &,FILE *);
 

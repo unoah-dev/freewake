@@ -1,3 +1,11 @@
+#include "freewake/read_input.hpp"
+#include "freewake/general.hpp"
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
+#include <string>
+
+
 //reads general information from input file
 //void General_Info_from_File(double &,double &,double &,double [3],int &,\
 //							double &,double &,double &,double &,int &,int &,\

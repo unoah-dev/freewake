@@ -1,3 +1,13 @@
+#include "freewake/equation_system.hpp"
+#include "freewake/general.hpp"
+#include "freewake/gauss.hpp"
+#include "freewake/induced_velocity.hpp"
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
+#include <vector>
+
+
 
 //declerations of subroutines used in Vorticity_Distribution
 void FlexWingVortDist(const GENERAL,const PANEL *,\

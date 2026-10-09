@@ -1,3 +1,5 @@
+#include "freewake/gauss.hpp"
+
 #include <Eigen/Dense>
 #include <Eigen/LU>
 #include <memory>

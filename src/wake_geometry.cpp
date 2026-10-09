@@ -1,3 +1,14 @@
+#include "freewake/wake_geometry.hpp"
+#include "freewake/general.hpp"
+#include "freewake/induced_velocity.hpp"
+#include "freewake/gauss.hpp"
+
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
+#include <vector>
+
+
 //creates new wake DVE right aft of trailing edge
 void Squirt_out_Wake(const GENERAL,const PANEL *,DVE *,DVE *);
 //relaxing the wake

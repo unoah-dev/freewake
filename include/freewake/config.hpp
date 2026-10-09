@@ -1,6 +1,6 @@
 #pragma once
 
-#include "typedef.h"
+#include "freewake/typedef.hpp"
 #include <string>
 #include <vector>
 #include <array>

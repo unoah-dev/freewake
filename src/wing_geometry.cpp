@@ -1,3 +1,13 @@
+#include "freewake/wing_geometry.hpp"
+#include "freewake/general.hpp"
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
+#include <vector>
+#include <tuple>
+#include <array>
+
+
 //generates elementary wings of a panel
 void Elementary_Wings_Generation\
 					(const PANEL, const GENERAL, BOUND_VORTEX *, int &);

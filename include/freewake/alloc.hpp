@@ -8,8 +8,8 @@
 #include <cstdlib>
 #include <utility>
 
-static double my_memory_allocated = 0.0;
-static double my_memory_deleted = 0.0;
+inline double my_memory_allocated = 0.0;
+inline double my_memory_deleted = 0.0;
 #define GLOBAL_VAR_FOR_ALLOCATION my_memory_allocated
 #define GLOBAL_VAR_FOR_DELETION my_memory_deleted
 

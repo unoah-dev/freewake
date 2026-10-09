@@ -1,7 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
-#include "../include/general.h"
-#include "../include/PerfCode.h"
-#include "../include/Config.hpp"
+#include "freewake/general.hpp"
+#include "freewake/perf_code.hpp"
+#include "freewake/config.hpp"
 #include <iostream>
 #include <string>
 #include <cstring>

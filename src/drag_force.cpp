@@ -1,8 +1,10 @@
-//computes induced drag at trailing edge of DVE wing
-double Induced_DVE_Drag(const GENERAL,const PANEL*,DVE*,DVE**,\
-												const int,double*);
-//computes section drag of surface DVE
-double SectionDrag(double [600][5], double,double &,int,double &,const int);
+#include "freewake/drag_force.hpp"
+#include "freewake/general.hpp"
+#include "freewake/induced_velocity.hpp"
+#include "freewake/wake_geometry.hpp"
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
 
 //===================================================================//
 	//START Induced_DVE_Drag computation - Drag along trailing edge
@@ -463,7 +465,7 @@ DVE tempDVE;				//temporary DVE
 //================================================================================================================
 // SectionDrag
 //================================================================================================================
-double SectionDrag(double profiledata[600][5], double Re,double &cl,int rows,\
+double SectionDrag(double profiledata[][5], double Re,double &cl,int rows,\
 					double &cm,const int section)
 {
 	//input:

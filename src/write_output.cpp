@@ -1,3 +1,13 @@
+#include "freewake/write_output.hpp"
+#include "freewake/general.hpp"
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
+#include <filesystem>
+#include <string>
+#include <vector>
+
+
 //this file includes all the subroutine that handle writing to files.
 //the path to the directory in which the files are stored is defined in
 //OUTPUT_PATH, which is defined in general.h

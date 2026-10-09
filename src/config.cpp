@@ -1,5 +1,5 @@
-#include "Config.hpp"
-#include "typedef.h"
+#include "freewake/config.hpp"
+#include "freewake/typedef.hpp"
 #include <yaml-cpp/yaml.h>
 #include <fstream>
 #include <sstream>

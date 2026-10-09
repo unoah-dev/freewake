@@ -1,3 +1,10 @@
+#include "freewake/induced_velocity.hpp"
+#include "freewake/general.hpp"
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
+
+
 //In the code, the terms "KHH" and "Horstmann" refer to equations
 //and methods that are described in:
 //"Ein Mehrfach-Traglinienverfahren und seine Verwendung fuer Entwurf

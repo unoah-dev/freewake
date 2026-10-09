@@ -1,3 +1,11 @@
+#include "freewake/lift_force.hpp"
+#include "freewake/general.hpp"
+#include "freewake/induced_velocity.hpp"
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
+
+
 //computes total normal force acting on wing
 void DVE_Wing_Normal_Forces(const GENERAL,double **,double [2],double [2],\
 							double &,double &,double &,double &);
