@@ -17,7 +17,7 @@ inline constexpr double Pi = 3.14159265358979323846;
 inline constexpr double DtR = Pi / 180.0;
 inline constexpr double RtD = 180.0 / Pi;
 inline constexpr double DBL_EPS = 1e-14;
-inline const std::filesystem::path OUTPUT_PATH = "output";
+inline std::filesystem::path OUTPUT_PATH = "output";
 inline const std::filesystem::path AIRFOIL_PATH = "airfoils";
 inline constexpr const char* PROGRAM_VERSION = "FreeWake2018_Omega";
 

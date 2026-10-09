@@ -2,6 +2,8 @@
 #include "freewake/general.hpp"
 #include "freewake/perf_code.hpp"
 #include "freewake/config.hpp"
+#include "freewake/solver.hpp"
+
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -60,9 +62,18 @@ int i,ii,a,a2;		//loop counters, max AOA increment
 
 
 
-int main(int argc, char *argv[])
+namespace FreeWake {
 
+int run_simulation(const std::string& configFileInput, const std::string& outputDir, bool verbose)
 {
+    OUTPUT_PATH = outputDir;
+    std::filesystem::create_directories(OUTPUT_PATH);
+
+    if (verbose) {
+        std::cout << "[FreeWake] Configuration: " << configFileInput << "\n";
+        std::cout << "[FreeWake] Output Directory: " << outputDir << "\n";
+    }
+
 // This program computes the drag of an aircraft configuration.
 //
 // Step 0:	read in aircraft configuration, paneling, and airfoil info
@@ -145,7 +156,19 @@ printf("========================================================================
 //						   info.m,info.nopanel);
 //						   //Subroutine in read_input.cpp
 
-	std::string configFile = (argc > 1) ? argv[1] : "input.yaml";
+	std::string configFile = configFileInput;
+	if (configFile.empty()) {
+		if (std::filesystem::exists("input.yaml")) configFile = "input.yaml";
+		else if (std::filesystem::exists("input.txt")) configFile = "input.txt";
+		else configFile = "input.yaml";
+	} else if (!std::filesystem::exists(configFile)) {
+		if (configFile == "input.txt" && std::filesystem::exists("input.yaml")) {
+			configFile = "input.yaml";
+		} else if (configFile == "input.yaml" && std::filesystem::exists("input.txt")) {
+			configFile = "input.txt";
+		}
+	}
+
 	Config config;
 	std::vector<PANEL> panel_vec;
 
@@ -604,14 +627,18 @@ printf(" Dvt %lf Dfus %lf Dint %lf D %lf\n",Dvt,Dfuselage,Dint,D);
 	surfacePtr = nullptr;
 	cn = nullptr;
 	
-	fclose(MomSol);//close output file of trim iteration results
-	fclose(Performance);//close output file of performance calc's
-//printf("done\n");
-//printf("push any key and return ",PROGRAM_VERSION);
-//scanf("%c",&answer);
-//scanf("%c",&answer);
-	//return(0);
+	if (MomSol) {
+		fclose(MomSol); //close output file of trim iteration results
+		MomSol = nullptr;
+	}
+	if (Performance) {
+		fclose(Performance); //close output file of performance calc's
+		Performance = nullptr;
+	}
+	return 0;
 }
+
+} // namespace FreeWake
 //===================================================================//
 		//END of program
 //===================================================================//

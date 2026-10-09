@@ -47,9 +47,20 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(yaml-cpp)
 
-# FreeWake executable target
-add_executable(FreeWake
-    src/main_perf_code.cpp
+# CLI11 dependency
+find_package(CLI11 2.0 QUIET CONFIG)
+if (NOT TARGET CLI11::CLI11)
+    FetchContent_Declare(
+        cli11
+        GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
+        GIT_TAG        v2.4.1
+    )
+    FetchContent_MakeAvailable(cli11)
+endif()
+
+# FreeWake core library target
+add_library(freewake_core STATIC
+    src/solver.cpp
     src/config.cpp
     src/drag_force.cpp
     src/equation_system.cpp
@@ -62,6 +73,11 @@ add_executable(FreeWake
     src/wake_geometry.cpp
     src/wing_geometry.cpp
     src/write_output.cpp
+    src/commands/SolveCommand.cpp
+    src/commands/PointVelocityCommand.cpp
+    src/commands/MultiPointVelocityCommand.cpp
+    src/commands/AirfoilInfoCommand.cpp
+    src/cli/App.cpp
     include/freewake/alloc.hpp
     include/freewake/config.hpp
     include/freewake/drag_force.hpp
@@ -76,31 +92,46 @@ add_executable(FreeWake
     include/freewake/pitch_moment.hpp
     include/freewake/read_input.hpp
     include/freewake/ref_frame_transform.hpp
+    include/freewake/solver.hpp
     include/freewake/typedef.hpp
     include/freewake/vector_algebra.hpp
     include/freewake/wake_geometry.hpp
     include/freewake/wing_geometry.hpp
     include/freewake/write_output.hpp
+    include/freewake/commands/ICommand.hpp
+    include/freewake/commands/SolveCommand.hpp
+    include/freewake/commands/PointVelocityCommand.hpp
+    include/freewake/commands/MultiPointVelocityCommand.hpp
+    include/freewake/commands/AirfoilInfoCommand.hpp
+    include/freewake/cli/App.hpp
 )
 
-# Target-scoped include directories
-target_include_directories(FreeWake PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(freewake_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-# Target-scoped compiler warning flags
+if (MSVC)
+    target_compile_options(freewake_core PRIVATE /W4)
+else()
+    target_compile_options(freewake_core PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+target_link_libraries(freewake_core PUBLIC yaml-cpp Eigen3::Eigen CLI11::CLI11)
+
+if (UNIX AND NOT APPLE)
+    target_link_libraries(freewake_core PUBLIC m)
+endif()
+
+# FreeWake CLI executable target
+add_executable(FreeWake src/main.cpp)
+target_include_directories(FreeWake PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(FreeWake PRIVATE freewake_core CLI11::CLI11)
+
 if (MSVC)
     target_compile_options(FreeWake PRIVATE /W4)
 else()
     target_compile_options(FreeWake PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
-# Link libraries
-target_link_libraries(FreeWake PRIVATE yaml-cpp Eigen3::Eigen)
-
-# Link math library on UNIX systems if required
-if (UNIX AND NOT APPLE)
-    target_link_libraries(FreeWake PRIVATE m)
-endif()
-
-# Backward-compatible target alias
+# Backward-compatible target aliases
 add_executable(freewake ALIAS FreeWake)
+add_executable(freewake_cli ALIAS FreeWake)
 

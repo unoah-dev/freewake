@@ -568,22 +568,17 @@ void Read_Timestep(const int timestep,DVE *surfaceDVE,DVE **wakeDVE)
 	int nosurface;		//number of DVEs on the lifting surface
 
 	int index,span,time;// loop counter
-	char iofile[125];	//input-output-file
 	char ch;			//generic character
 	FILE *fp;			//output file
 
 	auto timeFile = resolve_output_file("timestep" + std::to_string(timestep) + ".txt");
 
 	// checks if input file exists
-	if ((fp = fopen(timeFile.string().c_str(), "r"))== NULL)
+	if ((fp = fopen(timeFile.string().c_str(), "r")) == NULL)
 	{
-		printf("Output file could not be opened:\n");
-		scanf("%c",&ch);
+		printf("Timestep file could not be opened: %s\n", timeFile.string().c_str());
 		exit(1);
 	}
-
-	//opens input file
-	fp = fopen(iofile, "r");
 
 	//find the ':'-sign in input file before program version
 	do	ch = fgetc(fp);
